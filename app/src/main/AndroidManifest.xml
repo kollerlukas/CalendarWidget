@@ -1,0 +1,39 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          xmlns:tools="http://schemas.android.com/tools"
+          package="us.koller.calendarwidget">
+
+    <uses-permission android:name="android.permission.READ_CALENDAR"/>
+
+    <application
+            android:allowBackup="true"
+            android:label="@string/app_name"
+            android:icon="@mipmap/ic_launcher"
+            android:roundIcon="@mipmap/ic_launcher_round"
+            android:supportsRtl="true"
+            android:theme="@style/AppTheme"
+            tools:ignore="AllowBackup,GoogleAppIndexingWarning">
+
+        <!-- AppWidgetProvider -->
+        <receiver android:name=".CalendarAppWidgetProvider">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
+            </intent-filter>
+            <meta-data
+                    android:name="android.appwidget.provider"
+                    android:resource="@xml/calendar_appwidget_info"/>
+        </receiver>
+
+        <!-- AppWidgetConfigure -->
+        <activity android:name=".CalendarAppWidgetConfigure">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE"/>
+            </intent-filter>
+        </activity>
+
+        <!-- RemoteViewsService -->
+        <service
+                android:name=".CalendarRemoteViewsService"
+                android:permission="android.permission.BIND_REMOTEVIEWS"
+                android:exported="false"/>
+    </application>
+</manifest>
