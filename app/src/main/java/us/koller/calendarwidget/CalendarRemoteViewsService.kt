@@ -54,18 +54,25 @@ class CalendarRemoteViewsFactory(var context: Context) : RemoteViewsService.Remo
         /* create new RemoteViews instance */
         val remoteViews = RemoteViews(context.packageName, R.layout.event_item_view)
         /* bind Data */
+        /*remoteViews.setTextViewText(R.id.text, events[index].title)*/
+
         /* set colordot color */
-        events[index].displayColor?.let { remoteViews.setInt(R.id.colordot, "setBackgroundColor", it) }
+        /*events[index].displayColor?.let { remoteViews.setInt(R.id.colordot, "setBackgroundColor", it) }*/
         /* set event start time */
-        remoteViews.setTextViewText(R.id.event_start_time,
-            SimpleDateFormat("H:m").format(events[index].dtstart?.let { Date(it) })
+        remoteViews.setTextViewText(
+            R.id.event_start_time,
+            when (events[index].allDay) {
+                false -> SimpleDateFormat("HH:mm").format(events[index].dtstart?.let { Date(it) })
+                else -> ""
+            }
+
         )
         /* set event title */
         remoteViews.setTextViewText(R.id.event_title, events[index].title)
-        remoteViews.setTextViewText(R.id.text, events[index].title)
         /* set event date */
-        remoteViews.setTextViewText(R.id.event_date,
-            SimpleDateFormat("E, d M").format(events[index].dtstart?.let { Date(it) })
+        remoteViews.setTextViewText(
+            R.id.event_date,
+            SimpleDateFormat("EEE, dd MMMM").format(events[index].dtstart?.let { Date(it) })
         )
 
         /* set the fill-intent to pass data back to CalendarAppwidgetProvider */

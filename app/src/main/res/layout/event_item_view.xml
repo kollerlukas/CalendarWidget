@@ -4,13 +4,13 @@
               android:layout_height="match_parent"
               android:orientation="horizontal">
 
-    <View
+    <!--<View
             android:id="@+id/colordot"
             android:layout_width="16dp"
             android:layout_height="16dp"
             android:layout_gravity="center_vertical"
             android:layout_margin="4dp"
-            android:background="@drawable/colordot_bg"/>
+            android:background="@drawable/colordot_bg"/>-->
 
     <TextView
             android:id="@+id/event_start_time"
@@ -27,6 +27,7 @@
             android:layout_weight="1"
             android:layout_height="wrap_content"
             android:textSize="16sp"
+            android:ellipsize="end"
             android:textColor="@color/textColorPrimary"
             android:layout_gravity="center_vertical"
             android:layout_margin="4dp"/>
