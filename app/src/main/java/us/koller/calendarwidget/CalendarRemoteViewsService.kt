@@ -50,14 +50,11 @@ class CalendarRemoteViewsFactory(var context: Context) : RemoteViewsService.Remo
     }
 
     override fun getViewAt(index: Int): RemoteViews {
-        Log.d("CalendarRemoteViewsService", "getViewAt() called")
         /* create new RemoteViews instance */
         val remoteViews = RemoteViews(context.packageName, R.layout.event_item_view)
         /* bind Data */
-        /*remoteViews.setTextViewText(R.id.text, events[index].title)*/
-
         /* set colordot color */
-        /*events[index].displayColor?.let { remoteViews.setInt(R.id.colordot, "setBackgroundColor", it) }*/
+        events[index].displayColor?.let { remoteViews.setInt(R.id.colordot, "setBackgroundColor", it) }
         /* set event start time */
         remoteViews.setTextViewText(
             R.id.event_start_time,
@@ -65,7 +62,6 @@ class CalendarRemoteViewsFactory(var context: Context) : RemoteViewsService.Remo
                 false -> SimpleDateFormat("HH:mm").format(events[index].dtstart?.let { Date(it) })
                 else -> ""
             }
-
         )
         /* set event title */
         remoteViews.setTextViewText(R.id.event_title, events[index].title)
@@ -83,7 +79,7 @@ class CalendarRemoteViewsFactory(var context: Context) : RemoteViewsService.Remo
         /* put eventUri as extra */
         fillInIntent.putExtra(CalendarAppWidgetProvider.EVENT_URI_EXTRA, eventUri.toString())
         /* set the fill-intent */
-        remoteViews.setOnClickFillInIntent(R.id.text, fillInIntent)
+        remoteViews.setOnClickFillInIntent(R.id.event_card, fillInIntent)
 
         return remoteViews
     }
