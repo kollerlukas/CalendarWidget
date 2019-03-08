@@ -42,16 +42,7 @@ class CalendarAppWidgetConfigure : AppCompatActivity() {
         /* check if READ_CALENDAR permission is granted */
         if (ContextCompat.checkSelfPermission(this, perm) != PackageManager.PERMISSION_GRANTED) {
             /* permission is not granted => request permission */
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this, perm)) {
-                /* asking for explanation => display explanation */
-                // TODO: display explanation
-                Log.d("CalendarAppWidgetConfig", "asking for explanation")
-                setResult(Activity.RESULT_CANCELED)
-                finish()
-            } else {
-                /* no explanation required => request permission */
-                ActivityCompat.requestPermissions(this, arrayOf(perm), PERM_REQUEST_CODE)
-            }
+            ActivityCompat.requestPermissions(this, arrayOf(perm), PERM_REQUEST_CODE)
         } else {
             /* permission is already granted => add widget */
             val resultValue = Intent()
