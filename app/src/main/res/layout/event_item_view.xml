@@ -13,7 +13,7 @@
             android:layout_height="16dp"
             android:layout_gravity="center_vertical"
             android:layout_margin="4dp"
-            android:background="@drawable/colordot_bg"
+            android:src="@drawable/colordot_bg"
             tools:ignore="ContentDescription"/>
 
     <TextView

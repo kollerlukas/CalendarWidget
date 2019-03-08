@@ -54,7 +54,7 @@ class CalendarRemoteViewsFactory(var context: Context) : RemoteViewsService.Remo
         val remoteViews = RemoteViews(context.packageName, R.layout.event_item_view)
         /* bind Data */
         /* set colordot color */
-        events[index].displayColor?.let { remoteViews.setInt(R.id.colordot, "setBackgroundColor", it) }
+        events[index].displayColor?.let { remoteViews.setInt(R.id.colordot, "setColorFilter", it) }
         /* set event start time */
         remoteViews.setTextViewText(
             R.id.event_start_time,
