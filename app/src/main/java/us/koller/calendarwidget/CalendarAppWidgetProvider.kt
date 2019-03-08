@@ -31,8 +31,6 @@ class CalendarAppWidgetProvider : AppWidgetProvider() {
 
             /* create intent to start CalendarRemoteViewsService */
             val intent = Intent(context, CalendarRemoteViewsService::class.java)
-            /*intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
-            intent.data = Uri.parse(intent.toUri(Intent.URI_INTENT_SCHEME))*/
             /* set adapter via the intent */
             remoteViews.setRemoteAdapter(R.id.events_list, intent)
 

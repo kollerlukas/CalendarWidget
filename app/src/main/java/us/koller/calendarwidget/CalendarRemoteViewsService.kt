@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.Intent
 import android.icu.text.SimpleDateFormat
 import android.provider.CalendarContract
-import android.util.Log
 import android.widget.RemoteViews
 import android.widget.RemoteViewsService
 import java.util.*
