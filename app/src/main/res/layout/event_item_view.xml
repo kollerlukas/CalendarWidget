@@ -22,29 +22,13 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:textSize="12sp"
-            android:textColor="@color/textColorSecondary"
-            android:layout_margin="4dp"/>
+            style="@style/SecondaryTextStyle"/>
 
     <TextView
             android:id="@+id/event_title"
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:textSize="16sp"
-            android:ellipsize="end"
-            android:maxLines="1"
-            android:textStyle="bold"
-            android:textColor="@color/textColorPrimary"
             android:layout_gravity="center_vertical"
-            android:layout_margin="4dp"/>
-
-    <TextView
-            android:id="@+id/event_date"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="12sp"
-            android:textColor="@color/textColorSecondary"
-            android:layout_gravity="center_vertical"
-            android:layout_margin="4dp"/>
+            style="@style/PrimaryTextStyle"/>
 </LinearLayout>

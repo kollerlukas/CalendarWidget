@@ -10,4 +10,7 @@
 
     <!-- bg color for event card -->
     <color name="event_card_bg_color">#33000000</color>
+
+    <!-- shadow color for text -->
+    <color name="text_shadow_color">#48000000</color>
 </resources>

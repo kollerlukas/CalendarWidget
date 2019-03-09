@@ -22,59 +22,57 @@ class CalendarRemoteViewsService : RemoteViewsService() {
 /**
  *
  * */
-class CalendarRemoteViewsFactory(var packageName: String, var loader: CalendarLoader) :
-    RemoteViewsService.RemoteViewsFactory {
-
-    var events: List<Event> = emptyList()
-
-    override fun onCreate() {
-
-    }
+class CalendarRemoteViewsFactory(packageName: String, var loader: CalendarLoader) :
+    SectionedRemoteViewsFactory<Event>(packageName) {
 
     override fun getLoadingView(): RemoteViews? {
         /* no loadingView needed */
         return null
     }
 
-    override fun getItemId(index: Int): Long {
-        /* use position as Event.id as itemId */
-        return events[index].id
-    }
-
     override fun onDataSetChanged() {
         /* use loader to load events */
-        events = loader.loadEvents(7)
+        val events = loader.loadEvents(7)
+        setItems(events)
+        /* add sections */
+        events
+            /* map each event to its date */
+            .map { SimpleDateFormat("EEE, dd MMMM").format(Date(it.dtstart)) }
+            /* map to Pair of index and date */
+            .mapIndexed { i, d -> Pair<Int, String>(i, d) }
+            /* group by the date */
+            .groupBy { it.second }
+            /* find the lowest index with a certain date */
+            .map { Pair(it.value.minBy { it.first }!!.first, it.key) }
+            /* add the sections */
+            .forEach { addSection(it.first, it.second) }
     }
 
-    override fun hasStableIds(): Boolean {
-        return true
+    override fun getItemId(item: Event): Long {
+        /* use position as Event.id as itemId */
+        return item.id
     }
 
-    override fun getViewAt(index: Int): RemoteViews {
+    override fun getViewAt(item: Event): RemoteViews {
         /* create new RemoteViews instance */
         val remoteViews = RemoteViews(packageName, R.layout.event_item_view)
         /* bind Data */
         /* set colordot color */
-        events[index].displayColor.let { remoteViews.setInt(R.id.colordot, "setColorFilter", it) }
+        remoteViews.setInt(R.id.colordot, "setColorFilter", item.displayColor)
         /* set event start time */
         remoteViews.setTextViewText(
             R.id.event_start_time,
-            when (events[index].allDay) {
-                false -> SimpleDateFormat("HH:mm").format(Date(events[index].dtstart))
+            when (item.allDay) {
+                false -> SimpleDateFormat("HH:mm").format(Date(item.dtstart))
                 else -> ""
             }
         )
         /* set event title */
-        remoteViews.setTextViewText(R.id.event_title, events[index].title)
-        /* set event date */
-        remoteViews.setTextViewText(
-            R.id.event_date,
-            SimpleDateFormat("EEE, dd MMMM").format(Date(events[index].dtstart))
-        )
+        remoteViews.setTextViewText(R.id.event_title, item.title)
 
         /* set the fill-intent to pass data back to CalendarAppwidgetProvider */
         /* construct eventUri to open event in calendar app */
-        val eventUri = ContentUris.withAppendedId(CalendarContract.Events.CONTENT_URI, events[index].id)
+        val eventUri = ContentUris.withAppendedId(CalendarContract.Events.CONTENT_URI, item.id)
         /* create fill-intent */
         val fillInIntent = Intent()
         /* put eventUri as extra */
@@ -84,17 +82,4 @@ class CalendarRemoteViewsFactory(var packageName: String, var loader: CalendarLo
 
         return remoteViews
     }
-
-    override fun getCount(): Int {
-        return events.size
-    }
-
-    override fun getViewTypeCount(): Int {
-        return 1
-    }
-
-    override fun onDestroy() {
-        /* nothing needs to be destroyed */
-    }
-
 }

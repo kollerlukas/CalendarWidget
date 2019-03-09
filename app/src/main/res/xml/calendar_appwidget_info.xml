@@ -6,6 +6,7 @@
                     android:minHeight="110dp"
                     android:minResizeWidth="250dp"
                     android:minResizeHeight="40dp"
+                    android:updatePeriodMillis="1800000"
                     android:initialLayout="@layout/calendar_appwidget_view"
                     android:configure="us.koller.calendarwidget.CalendarAppWidgetConfigure"
                     android:resizeMode="horizontal|vertical"
