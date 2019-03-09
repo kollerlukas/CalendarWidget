@@ -37,9 +37,12 @@ interface CalendarLoader {
 class CalendarLoaderImpl(private val contentResolver: ContentResolverWrapper) : CalendarLoader {
 
     /**
-     * simple wrapper interface for ContentResolver.query() to allow mocking for testing
+     * simple wrapper interface to allow mocking for testing
      * */
     interface ContentResolverWrapper {
+        /**
+         * wrapper function for ContentResolver.query()
+         * */
         fun query(
             uri: Uri?, projection: Array<String>?, selection: String?, selectionArgs: Array<String>?, sortOrder: String?
         ): Cursor
@@ -106,7 +109,7 @@ class CalendarLoaderImpl(private val contentResolver: ContentResolverWrapper) : 
             /* load all the events for each calendar */
             .map { c -> loadEventsForCalendar(c, currTimeStamp, currTimeStamp + nextDaysMillis) }
             /* map each calendar onto its events */
-            .map { c -> c.events!!.filter { e -> e.dtstart!! - currTimeStamp < nextDaysMillis } }
+            .map { c -> c.events.filter { e -> e.dtstart - currTimeStamp < nextDaysMillis } }
             .flatten()
             /* sort the events by starting time */
             .sortedBy { it.dtstart }
@@ -130,17 +133,14 @@ class CalendarLoaderImpl(private val contentResolver: ContentResolverWrapper) : 
             val calendars: MutableList<Calendar> = mutableListOf()
             /* iterate through the cursor */
             while (cursor.moveToNext()) {
-                /* instantiate calendar */
-                val calendar = Calendar(
+                /* instantiate calendar + add to the list */
+                Calendar(
                     cursor.getLong(CALENDAR_PROJECTION_ID_INDEX),
                     cursor.getString(CALENDAR_PROJECTION_DISPLAY_NAME_INDEX),
                     cursor.getInt(CALENDAR_PROJECTION_CALENDAR_COLOR_INDEX),
                     cursor.getString(CALENDAR_PROJECTION_ACCOUNT_NAME_INDEX),
-                    cursor.getString(CALENDAR_PROJECTION_OWNER_ACCOUNT_INDEX),
-                    emptyList()
-                )
-                /* load events + add to the list */
-                calendars.add(calendar)
+                    cursor.getString(CALENDAR_PROJECTION_OWNER_ACCOUNT_INDEX)
+                ).let { calendars.add(it) }
             }
             /* return all found calendars */
             return calendars
@@ -170,7 +170,7 @@ class CalendarLoaderImpl(private val contentResolver: ContentResolverWrapper) : 
             /* iterate through the cursor */
             while (cursor.moveToNext()) {
                 /* instantiate new event */
-                val event = Event(
+                Event(
                     cursor.getLong(EVENT_PROJECTION_ID_INDEX),
                     cursor.getString(EVENT_PROJECTION_TITLE_INDEX),
                     cursor.getInt(EVENT_PROJECTION_COLOR_INDEX),
@@ -180,8 +180,7 @@ class CalendarLoaderImpl(private val contentResolver: ContentResolverWrapper) : 
                     cursor.getLong(EVENT_PROJECTION_DTSTART_INDEX),
                     cursor.getLong(EVENT_PROJECTION_DTEND_INDEX),
                     cursor.getInt(EVENT_PROJECTION_ALL_DAY_INDEX) != 0
-                )
-                events.add(event)
+                ).let { events.add(it) }
             }
             /* overwrite empty events list */
             calendar.events = events

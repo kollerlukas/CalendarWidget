@@ -38,6 +38,9 @@ class CalendarRemoteViewsFactoryTest {
     /* class under test */
     private lateinit var factory: CalendarRemoteViewsFactory
 
+    /**
+     * setup mocks and class under test
+     * */
     @Before
     fun setUp() {
         /* create mocks */
@@ -50,16 +53,25 @@ class CalendarRemoteViewsFactoryTest {
         factory = CalendarRemoteViewsFactory(context.packageName, mockLoader)
     }
 
+    /**
+     * test CalendarRemoteViewsFactory.onCreate()
+     * */
     @Test
     fun testOnCreate() {
         /* onCreate() empty => nothing to test */
     }
 
+    /**
+     * test CalendarRemoteViewsFactory.getLoadingView()
+     * */
     @Test
     fun testGetLoadingView() {
         Assert.assertNull(factory.loadingView)
     }
 
+    /**
+     * test CalendarRemoteViewsFactory.getItemId()
+     * */
     @Test
     fun testGetItemId() {
         /* set data */
@@ -74,6 +86,9 @@ class CalendarRemoteViewsFactoryTest {
         }
     }
 
+    /**
+     * test CalendarRemoteViewsFactory.onDataSetChanged()
+     * */
     @Test
     fun testOnDataSetChanged() {
         /* call method to test */
@@ -85,11 +100,17 @@ class CalendarRemoteViewsFactoryTest {
         }
     }
 
+    /**
+     * test CalendarRemoteViewsFactory.hasStableIds()
+     * */
     @Test
     fun testHasStableIds() {
         Assert.assertTrue(factory.hasStableIds())
     }
 
+    /**
+     * test CalendarRemoteViewsFactory.getViewAt()
+     * */
     @Test
     fun testGetViewAt() {
         /* set data */
@@ -103,6 +124,9 @@ class CalendarRemoteViewsFactoryTest {
         /* sadly remoteViews doesn't provide interface to check properties */
     }
 
+    /**
+     * test CalendarRemoteViewsFactory.getCount()
+     * */
     @Test
     fun testGetCount() {
         /* set data */
@@ -117,6 +141,9 @@ class CalendarRemoteViewsFactoryTest {
         }
     }
 
+    /**
+     * test CalendarRemoteViewsFactory.getViewTypeCount()
+     * */
     @Test
     fun testGetViewTypeCount() {
         /* call method to test */
@@ -128,6 +155,9 @@ class CalendarRemoteViewsFactoryTest {
         }
     }
 
+    /**
+     * test CalendarRemoteViewsFactory.onDestroy()
+     * */
     @Test
     fun testOnDestroy() {
         /* onDestroy() empty => nothing to test */

@@ -109,6 +109,9 @@ class CalendarLoaderImplTest {
     /* class under test */
     private lateinit var loader: CalendarLoader
 
+    /**
+     * setup mocks and class under test
+     * */
     @Before
     fun setUp() {
         /* populate mocks with mock data */
@@ -123,6 +126,9 @@ class CalendarLoaderImplTest {
         loader = CalendarLoaderImpl(mockContentResolver)
     }
 
+    /**
+     * test CalendarLoaderImpl.loadEvents()
+     * */
     @Test
     fun testLoadEvents() {
         /* mock output-data */
@@ -138,6 +144,9 @@ class CalendarLoaderImplTest {
         }
     }
 
+    /**
+     * test CalendarLoaderImpl.loadCalendars()
+     * */
     @Test
     fun testLoadCalendars() {
         /* mock output-data */
@@ -154,6 +163,9 @@ class CalendarLoaderImplTest {
         }
     }
 
+    /**
+     * test CalendarLoaderImpl.loadEventsForCalendar()
+     * */
     @Test
     fun testLoadEventsForCalendar() {
         /* mock input-data */

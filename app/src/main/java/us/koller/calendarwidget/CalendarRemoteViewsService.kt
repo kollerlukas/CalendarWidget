@@ -55,12 +55,12 @@ class CalendarRemoteViewsFactory(var packageName: String, var loader: CalendarLo
         val remoteViews = RemoteViews(packageName, R.layout.event_item_view)
         /* bind Data */
         /* set colordot color */
-        events[index].displayColor?.let { remoteViews.setInt(R.id.colordot, "setColorFilter", it) }
+        events[index].displayColor.let { remoteViews.setInt(R.id.colordot, "setColorFilter", it) }
         /* set event start time */
         remoteViews.setTextViewText(
             R.id.event_start_time,
             when (events[index].allDay) {
-                false -> SimpleDateFormat("HH:mm").format(events[index].dtstart?.let { Date(it) })
+                false -> SimpleDateFormat("HH:mm").format(Date(events[index].dtstart))
                 else -> ""
             }
         )
@@ -69,7 +69,7 @@ class CalendarRemoteViewsFactory(var packageName: String, var loader: CalendarLo
         /* set event date */
         remoteViews.setTextViewText(
             R.id.event_date,
-            SimpleDateFormat("EEE, dd MMMM").format(events[index].dtstart?.let { Date(it) })
+            SimpleDateFormat("EEE, dd MMMM").format(Date(events[index].dtstart))
         )
 
         /* set the fill-intent to pass data back to CalendarAppwidgetProvider */
