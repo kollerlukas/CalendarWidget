@@ -6,10 +6,10 @@ package us.koller.calendarwidget
  * */
 data class Calendar(
     val id: Long = -1L,
-    val displayName: String = "Error",
+    val displayName: String = "",
     val calendarColor: Int = 0,
-    val accountName: String = "Error",
-    val ownerName: String = "Error",
+    val accountName: String = "",
+    val ownerName: String = "",
     var events: List<Event> = emptyList()
 )
 
@@ -19,10 +19,10 @@ data class Calendar(
  * */
 data class Event (
     var id: Long = -1L,
-    var title: String = "Error",
+    var title: String = "",
     var displayColor: Int = 0,
-    var description: String = "Error",
-    var location: String = "Error",
+    var description: String = "",
+    var location: String = "",
     var calendarId: Long = -1L,
     var dtstart: Long = -1L,
     var dtend: Long = -1L,
