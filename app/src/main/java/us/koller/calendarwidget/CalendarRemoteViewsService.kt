@@ -1,7 +1,6 @@
 package us.koller.calendarwidget
 
 import android.content.ContentUris
-import android.content.Context
 import android.content.Intent
 import android.icu.text.SimpleDateFormat
 import android.provider.CalendarContract
@@ -14,16 +13,19 @@ import java.util.*
  * */
 class CalendarRemoteViewsService : RemoteViewsService() {
     override fun onGetViewFactory(intent: Intent): RemoteViewsFactory {
-        return CalendarRemoteViewsFactory(applicationContext)
+        return CalendarRemoteViewsFactory(
+            applicationContext.packageName, CalendarLoaderImpl.wrap(applicationContext.contentResolver)
+        )
     }
 }
 
 /**
  *
  * */
-class CalendarRemoteViewsFactory(var context: Context) : RemoteViewsService.RemoteViewsFactory {
+class CalendarRemoteViewsFactory(var packageName: String, var loader: CalendarLoader) :
+    RemoteViewsService.RemoteViewsFactory {
 
-    private var events: List<Event> = emptyList()
+    var events: List<Event> = emptyList()
 
     override fun onCreate() {
 
@@ -41,7 +43,7 @@ class CalendarRemoteViewsFactory(var context: Context) : RemoteViewsService.Remo
 
     override fun onDataSetChanged() {
         /* use loader to load events */
-        events = CalendarLoader(context).loadEvents(7)
+        events = loader.loadEvents(7)
     }
 
     override fun hasStableIds(): Boolean {
@@ -50,7 +52,7 @@ class CalendarRemoteViewsFactory(var context: Context) : RemoteViewsService.Remo
 
     override fun getViewAt(index: Int): RemoteViews {
         /* create new RemoteViews instance */
-        val remoteViews = RemoteViews(context.packageName, R.layout.event_item_view)
+        val remoteViews = RemoteViews(packageName, R.layout.event_item_view)
         /* bind Data */
         /* set colordot color */
         events[index].displayColor?.let { remoteViews.setInt(R.id.colordot, "setColorFilter", it) }

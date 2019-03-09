@@ -1,19 +1,67 @@
 package us.koller.calendarwidget
 
 import android.content.ContentResolver
-import android.content.Context
 import android.database.Cursor
 import android.net.Uri
 import android.provider.CalendarContract
 
 /**
- *  helper class to load calendar & events synchronously
+ * CalendarLoader-interface to allow for mocking in testing
+ * CalendarLoader: helper to load calendar & events synchronously
+ * */
+interface CalendarLoader {
+
+    /** load all events from all calendars that start within the a given amount of days (nextDays)
+     * @param nextDays
+     * @return a list of all events */
+    @Suppress("RedundantVisibilityModifier")
+    public fun loadEvents(nextDays: Int): List<Event>
+
+    /** load all calendars
+     * @return a list of all found calendars (events attribute is empty) */
+    @Suppress("RedundantVisibilityModifier")
+    public fun loadCalendars(): List<Calendar>
+
+    /** load all events that start before a given timestamp (maxDtStart) and end after another given timestamp (minDtEnd) in for a given calendar (calendar)
+     * @param calendar
+     * @param minDtEnd
+     * @param maxDtStart
+     * @return modified calendar, containing all loaded events */
+    @Suppress("MemberVisibilityCanBePrivate", "RedundantVisibilityModifier")
+    public fun loadEventsForCalendar(calendar: Calendar, minDtEnd: Long, maxDtStart: Long): Calendar
+}
+
+/**
+ * implementation of the CalendarLoader interface
  *  */
-class CalendarLoader(context: Context) {
+class CalendarLoaderImpl(private val contentResolver: ContentResolverWrapper) : CalendarLoader {
+
+    /**
+     * simple wrapper interface for ContentResolver.query() to allow mocking for testing
+     * */
+    interface ContentResolverWrapper {
+        fun query(
+            uri: Uri?, projection: Array<String>?, selection: String?, selectionArgs: Array<String>?, sortOrder: String?
+        ): Cursor
+    }
 
     companion object {
+        /**
+         * simple function to wrap contentResolver
+         * */
+        fun wrap(contentResolver: ContentResolver): CalendarLoader {
+            return CalendarLoaderImpl(object : ContentResolverWrapper {
+                override fun query(
+                    uri: Uri?, projection: Array<String>?, selection: String?, selectionArgs: Array<String>?,
+                    sortOrder: String?
+                ): Cursor {
+                    return contentResolver.query(uri, projection, selection, selectionArgs, sortOrder)
+                }
+            })
+        }
+
         /* calendar projection array */
-        private val CALENDAR_PROJECTION: Array<String> = arrayOf(
+        val CALENDAR_PROJECTION: Array<String> = arrayOf(
             CalendarContract.Calendars._ID,
             CalendarContract.Calendars.ACCOUNT_NAME,
             CalendarContract.Calendars.CALENDAR_COLOR,
@@ -21,14 +69,14 @@ class CalendarLoader(context: Context) {
             CalendarContract.Calendars.OWNER_ACCOUNT
         )
         /* calendar projection indices */
-        private const val CALENDAR_PROJECTION_ID_INDEX = 0
-        private const val CALENDAR_PROJECTION_ACCOUNT_NAME_INDEX = 1
-        private const val CALENDAR_PROJECTION_CALENDAR_COLOR_INDEX = 2
-        private const val CALENDAR_PROJECTION_DISPLAY_NAME_INDEX = 3
-        private const val CALENDAR_PROJECTION_OWNER_ACCOUNT_INDEX = 4
+        const val CALENDAR_PROJECTION_ID_INDEX = 0
+        const val CALENDAR_PROJECTION_ACCOUNT_NAME_INDEX = 1
+        const val CALENDAR_PROJECTION_CALENDAR_COLOR_INDEX = 2
+        const val CALENDAR_PROJECTION_DISPLAY_NAME_INDEX = 3
+        const val CALENDAR_PROJECTION_OWNER_ACCOUNT_INDEX = 4
 
         /* event projection array */
-        private val EVENTS_PROJECTION: Array<String> = arrayOf(
+        val EVENTS_PROJECTION: Array<String> = arrayOf(
             CalendarContract.Events._ID,
             CalendarContract.Events.TITLE,
             CalendarContract.Events.DISPLAY_COLOR,
@@ -40,25 +88,18 @@ class CalendarLoader(context: Context) {
             CalendarContract.Events.ALL_DAY
         )
         /* event projection indices */
-        private const val EVENT_PROJECTION_ID_INDEX = 0
-        private const val EVENT_PROJECTION_TITLE_INDEX = 1
-        private const val EVENT_PROJECTION_COLOR_INDEX = 2
-        private const val EVENT_PROJECTION_DESCRIPTION_INDEX = 3
-        private const val EVENT_PROJECTION_LOCATION_INDEX = 4
-        private const val EVENT_PROJECTION_CALENDAR_ID_INDEX = 5
-        private const val EVENT_PROJECTION_DTSTART_INDEX = 6
-        private const val EVENT_PROJECTION_DTEND_INDEX = 7
-        private const val EVENT_PROJECTION_ALL_DAY_INDEX = 8
+        const val EVENT_PROJECTION_ID_INDEX = 0
+        const val EVENT_PROJECTION_TITLE_INDEX = 1
+        const val EVENT_PROJECTION_COLOR_INDEX = 2
+        const val EVENT_PROJECTION_DESCRIPTION_INDEX = 3
+        const val EVENT_PROJECTION_LOCATION_INDEX = 4
+        const val EVENT_PROJECTION_CALENDAR_ID_INDEX = 5
+        const val EVENT_PROJECTION_DTSTART_INDEX = 6
+        const val EVENT_PROJECTION_DTEND_INDEX = 7
+        const val EVENT_PROJECTION_ALL_DAY_INDEX = 8
     }
 
-    /* retrieve contentResolver from provided context */
-    var contentResolver: ContentResolver = context.contentResolver
-
-    /** load all events from all calendars that start within the a given amount of days (nextDays)
-     * @param nextDays
-     * @return a list of all events */
-    @Suppress("RedundantVisibilityModifier")
-    public fun loadEvents(nextDays: Int): List<Event> {
+    override fun loadEvents(nextDays: Int): List<Event> {
         val currTimeStamp = System.currentTimeMillis()
         val nextDaysMillis = nextDays * 24 * 60 * 60 * 1000
         return loadCalendars().asSequence()
@@ -74,10 +115,7 @@ class CalendarLoader(context: Context) {
             .toList()
     }
 
-    /** load all calendars
-     * @return a list of all found calendars (events attribute is empty) */
-    @Suppress("RedundantVisibilityModifier")
-    public fun loadCalendars(): List<Calendar> {
+    override fun loadCalendars(): List<Calendar> {
         /* build query */
         val uri: Uri = CalendarContract.Calendars.CONTENT_URI
         /* retrieve all calendars */
@@ -115,13 +153,7 @@ class CalendarLoader(context: Context) {
         }
     }
 
-    /** load all events that start before a given timestamp (maxDtStart) and end after another given timestamp (minDtEnd) in for a given calendar (calendar)
-     * @param calendar
-     * @param minDtEnd
-     * @param maxDtStart
-     * @return modified calendar, containing all loaded events */
-    @Suppress("MemberVisibilityCanBePrivate", "RedundantVisibilityModifier")
-    public fun loadEventsForCalendar(calendar: Calendar, minDtEnd: Long, maxDtStart: Long): Calendar {
+    override fun loadEventsForCalendar(calendar: Calendar, minDtEnd: Long, maxDtStart: Long): Calendar {
         /* read events for the calendar */
         /* build query */
         val uri: Uri = CalendarContract.Events.CONTENT_URI
