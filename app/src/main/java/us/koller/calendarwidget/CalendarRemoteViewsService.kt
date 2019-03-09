@@ -25,6 +25,14 @@ class CalendarRemoteViewsService : RemoteViewsService() {
 class CalendarRemoteViewsFactory(packageName: String, var loader: CalendarLoader) :
     SectionedRemoteViewsFactory<Event>(packageName) {
 
+    override fun onCreate() {
+        /* nothing to create */
+    }
+
+    override fun onDestroy() {
+        /* nothing to destroy */
+    }
+
     override fun getLoadingView(): RemoteViews? {
         /* no loadingView needed */
         return null
@@ -43,9 +51,9 @@ class CalendarRemoteViewsFactory(packageName: String, var loader: CalendarLoader
             /* group by the date */
             .groupBy { it.second }
             /* find the lowest index with a certain date */
-            .map { Pair(it.value.minBy { it.first }!!.first, it.key) }
+            .map { Pair(it.value.minBy { it.first }?.first, it.key) }
             /* add the sections */
-            .forEach { addSection(it.first, it.second) }
+            .forEach { it.first?.let { it1 -> addSection(it1, it.second) } }
     }
 
     override fun getItemId(item: Event): Long {

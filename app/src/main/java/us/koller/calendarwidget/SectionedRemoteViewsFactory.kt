@@ -63,10 +63,6 @@ abstract class SectionedRemoteViewsFactory<T>(var packageName: String) : RemoteV
 
     /* overridden methods from RemoteViewsService.RemoteViewsFactory */
 
-    override fun onCreate() {
-        /* nothing needs to be created */
-    }
-
     final override fun getItemId(index: Int): Long {
         return if (items[index] is Section) {
             index * 2L + 1L /* map to the uneven numbers */
@@ -83,12 +79,12 @@ abstract class SectionedRemoteViewsFactory<T>(var packageName: String) : RemoteV
     final override fun getViewAt(index: Int): RemoteViews {
         when {
             items[index] is Section -> {
-                val section: Section = items[index] as Section
+                val section: Section? = items[index] as? Section
                 /* create section remoteView */
                 val remoteViews = RemoteViews(packageName, R.layout.section_item_view)
                 /* bind Data */
                 /* set section title */
-                remoteViews.setTextViewText(R.id.section_title, section.title)
+                remoteViews.setTextViewText(R.id.section_title, section?.title)
                 /* return section remoteViews */
                 return remoteViews
             }
@@ -107,9 +103,5 @@ abstract class SectionedRemoteViewsFactory<T>(var packageName: String) : RemoteV
 
     final override fun getViewTypeCount(): Int {
         return 2 /* two viewTypes: regular item & section item */
-    }
-
-    override fun onDestroy() {
-        /* nothing needs to be destroyed */
     }
 }
