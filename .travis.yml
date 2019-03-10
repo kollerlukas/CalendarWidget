@@ -11,26 +11,28 @@ env:
 
 android:
   components:
+  - tools
+  - platform-tools
   # The SDK version used to compile your project
   - android-$ANDROID_API_LEVEL
   # The BuildTools version used by your project
   - build-tools-$ANDROID_BUILD_TOOLS_VERSION
-  # system image
-  #- sys-img-${ANDROID_ABI}-android-${ANDROID_API_LEVEL}
+  # Emulator config: system image
+  - sys-img-${ANDROID_ABI}-android-${ANDROID_API_LEVEL}
 
 before_install:
   # Accept all sdk licenses
   yes | sdkmanager "platforms;android-${ANDROID_API_LEVEL}"
 
 before_script:
-  # list the target ids
-  #- android list targets
   # Emulator Management: Create, Start
-  #- echo no | android create avd --force -n test -t "android-${EMULATOR_API_LEVEL}" --abi $ANDROID_ABI -c 100M
-  #- emulator -avd test -no-audio -no-window &
+  - echo no | android create avd --force -n test -t "android-"$EMULATOR_API_LEVEL --abi $ANDROID_ABI -c 100M
+  - emulator -avd test -no-audio -no-window &
   # wait for emulator
-  #- android-wait-for-emulator
+  - android-wait-for-emulator
 
-# Run assemble and unit tests
 script:
+  # list the target ids
+  - android list target
+  # Run assemble and unit tests
   - ./gradlew clean assembleDebug assembleRelease connectedCheck
