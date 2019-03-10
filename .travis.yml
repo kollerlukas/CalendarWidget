@@ -24,7 +24,7 @@ before_script:
   # list the target ids
   - android list targets
   # Emulator Management: Create, Start
-  - echo no | android create avd --force -n test -t android-$ANDROID_API_LEVEL --abi $ANDROID_ABI -c 100M
+  - echo no | android create avd --force -n test -t "android-${ANDROID_API_LEVEL}" -c 100M
   - emulator -avd test -no-audio -no-window &
   # wait for emulator
   - android-wait-for-emulator
