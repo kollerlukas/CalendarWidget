@@ -13,9 +13,12 @@ import java.util.Date
  * */
 class CalendarRemoteViewsService : RemoteViewsService() {
     override fun onGetViewFactory(intent: Intent): RemoteViewsFactory {
-        return CalendarRemoteViewsFactory(
+        val factory = CalendarRemoteViewsFactory(
             applicationContext.packageName, CalendarLoaderImpl.wrap(applicationContext.contentResolver)
         )
+        factory.todayString = applicationContext.getString(R.string.today)
+        factory.tomorrowString = applicationContext.getString(R.string.tomorrow)
+        return factory
     }
 }
 
@@ -24,6 +27,9 @@ class CalendarRemoteViewsService : RemoteViewsService() {
  * */
 class CalendarRemoteViewsFactory(packageName: String, var loader: CalendarLoader) :
     SectionedRemoteViewsFactory<Event>(packageName) {
+
+    var todayString = ""
+    var tomorrowString = ""
 
     override fun onCreate() {
         /* nothing to create */
@@ -39,13 +45,26 @@ class CalendarRemoteViewsFactory(packageName: String, var loader: CalendarLoader
     }
 
     override fun onDataSetChanged() {
+        /* date formatter */
+        val formatter = SimpleDateFormat("EEE, dd MMMM")
+        /* calculate today's and tomorrows date to replace by "Today" or "Tomorrow" string */
+        val currTimeStamp = System.currentTimeMillis()
+        val today = formatter.format(Date(currTimeStamp))
+        val tomorrow = formatter.format(Date(currTimeStamp + 24 * 60 * 60 * 1000))
         /* use loader to load events */
         val events = loader.loadEvents(7)
         setItems(events)
         /* add sections */
         events
             /* map each event to its date */
-            .map { SimpleDateFormat("EEE, dd MMMM").format(Date(it.dtstart)) }
+            .map {
+                val date = formatter.format(Date(it.dtstart))
+                when (date) {
+                    today -> todayString
+                    tomorrow -> tomorrowString
+                    else -> date
+                }
+            }
             /* map to Pair of index and date */
             .mapIndexed { i, d -> Pair<Int, String>(i, d) }
             /* group by the date */
