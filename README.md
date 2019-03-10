@@ -2,3 +2,7 @@
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/c64cac182769406092744ea77d732ca2)](https://www.codacy.com/app/kollerlukas/CalendarWidget?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=kollerlukas/CalendarWidget&amp;utm_campaign=Badge_Grade)
 # CalendarWidget
 Simple Android Calendar Widget for your homescreen
+
+<div>
+<img src="https://github.com/kollerlukas/CalendarWidget/raw/master/screenshots/screenshot.png" alt="Screenshot" width="200">
+</div>
