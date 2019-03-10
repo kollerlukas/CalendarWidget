@@ -8,9 +8,13 @@ android:
   # system image
   - sys-img-armeabi-v7a-android-28
 
-  # Accept all sdk licenses
 before_install:
+  # Accept all sdk licenses
   yes | sdkmanager "platforms;android-28"
+
+before_script:
+  # wait for emulator
+  - android-wait-for-emulator
 
 # Run assemble and unit tests
 script:
