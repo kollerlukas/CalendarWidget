@@ -32,8 +32,16 @@ abstract class SectionedRemoteViewsFactory<T>(var packageName: String) : RemoteV
      * set the items that should be displayed in the ListView. Removes all previously set sections
      * */
     fun setItems(items: List<T>) {
-        this.items = items.map { i -> Item(i) }.toMutableList()
+        this.items = items.map { Item(it) }.toMutableList()
         this.sections = mutableListOf()
+    }
+
+    /**
+     * return the items from the ListView, without sections
+     * */
+    fun getItems(): List<T> {
+        @Suppress("UNCHECKED_CAST")
+        return items.filter { it is Item<*> }.map { (it as Item<T>).t }
     }
 
     /**

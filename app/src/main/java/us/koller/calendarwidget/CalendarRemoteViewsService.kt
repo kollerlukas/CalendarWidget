@@ -16,6 +16,7 @@ class CalendarRemoteViewsService : RemoteViewsService() {
         val factory = CalendarRemoteViewsFactory(
             applicationContext.packageName, CalendarLoaderImpl.wrap(applicationContext.contentResolver)
         )
+        /* loading string resources here, because access to applicationContext */
         factory.todayString = applicationContext.getString(R.string.today)
         factory.tomorrowString = applicationContext.getString(R.string.tomorrow)
         return factory
