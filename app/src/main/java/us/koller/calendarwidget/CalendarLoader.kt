@@ -107,9 +107,9 @@ class CalendarLoaderImpl(private val contentResolver: ContentResolverWrapper) : 
         val nextDaysMillis = nextDays * 24 * 60 * 60 * 1000
         return loadCalendars().asSequence()
             /* load all the events for each calendar */
-            .map { c -> loadEventsForCalendar(c, currTimeStamp, currTimeStamp + nextDaysMillis) }
+            .map { loadEventsForCalendar(it, currTimeStamp, currTimeStamp + nextDaysMillis) }
             /* map each calendar onto its events */
-            .map { c -> c.events.filter { e -> e.dtstart - currTimeStamp < nextDaysMillis } }
+            .map { it.events.filter { it.dtstart - currTimeStamp < nextDaysMillis } }
             .flatten()
             /* sort the events by starting time */
             .sortedBy { it.dtstart }

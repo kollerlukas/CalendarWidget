@@ -6,7 +6,7 @@ import android.icu.text.SimpleDateFormat
 import android.provider.CalendarContract
 import android.widget.RemoteViews
 import android.widget.RemoteViewsService
-import java.util.*
+import java.util.Date
 
 /**
  *

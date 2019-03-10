@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- TODO: update widget -->
-<!-- TODO: add previewImage: android:previewImage="@drawable/preview" -->
 <appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
                     android:minWidth="250dp"
                     android:minHeight="110dp"
@@ -8,6 +7,7 @@
                     android:minResizeHeight="40dp"
                     android:updatePeriodMillis="1800000"
                     android:initialLayout="@layout/calendar_appwidget_view"
+                    android:previewImage="@drawable/preview_image"
                     android:configure="us.koller.calendarwidget.CalendarAppWidgetConfigure"
                     android:resizeMode="horizontal|vertical"
                     android:widgetCategory="home_screen"/>
