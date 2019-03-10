@@ -13,6 +13,9 @@ before_install:
   yes | sdkmanager "platforms;android-28"
 
 before_script:
+  # Emulator Management: Create, Start
+  - echo no | android create avd --force -n test -t android-22 --abi armeabi-v7a -c 100M
+  - emulator -avd test -no-audio -no-window &
   # wait for emulator
   - android-wait-for-emulator
 
