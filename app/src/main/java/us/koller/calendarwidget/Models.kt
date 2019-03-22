@@ -18,15 +18,15 @@ data class Calendar(
  *      https://developer.android.com/guide/topics/providers/calendar-provider#events
  * */
 data class Event(
-    var id: Long = -1L,
-    var title: String = "",
-    var displayColor: Int = 0,
-    var description: String = "",
-    var location: String = "",
-    var calendarId: Long = -1L,
-    var dtstart: Long = -1L,
-    var duration: String? = null,
-    var allDay: Boolean = false,
+    val id: Long = -1L,
+    val title: String = "",
+    val displayColor: Int = 0,
+    val description: String = "",
+    val location: String = "",
+    val calendarId: Long = -1L,
+    val dtstart: Long = -1L,
+    val duration: String? = null,
+    val allDay: Boolean = false,
     var instances: List<Event.Instance> = emptyList()
 ) {
     /**
@@ -34,9 +34,9 @@ data class Event(
      *      https://developer.android.com/reference/android/provider/CalendarContract.Instances.html
      * */
     data class Instance(
-        var id: Long = -1L,
-        var begin: Long = -1L,
-        var end: Long = -1L,
-        var event: Event = Event()
+        val id: Long = -1L,
+        val begin: Long = -1L,
+        val end: Long = -1L,
+        val event: Event = Event()
     )
 }

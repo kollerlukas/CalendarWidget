@@ -6,6 +6,7 @@ import android.appwidget.AppWidgetProvider
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.provider.CalendarContract
 import android.widget.RemoteViews
 
 /**
@@ -57,6 +58,15 @@ class CalendarAppWidgetProvider : AppWidgetProvider() {
                     Intent(Intent.ACTION_VIEW)
                         .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                         .setData(Uri.parse(intent.getStringExtra(CalendarAppWidgetProvider.EVENT_URI_EXTRA)))
+                        /* copy over begin & end time */
+                        .putExtra(
+                            CalendarContract.EXTRA_EVENT_BEGIN_TIME,
+                            intent.getLongExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, -1L)
+                        )
+                        .putExtra(
+                            CalendarContract.EXTRA_EVENT_END_TIME,
+                            intent.getLongExtra(CalendarContract.EXTRA_EVENT_END_TIME, -1L)
+                        )
                 )
         }
         super.onReceive(context, intent)

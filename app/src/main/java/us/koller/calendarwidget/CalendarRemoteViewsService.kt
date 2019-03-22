@@ -109,12 +109,14 @@ class CalendarRemoteViewsFactory(packageName: String, private val loader: Calend
 
         /* set the fill-intent to pass data back to CalendarAppwidgetProvider */
         /* construct eventUri to open event in calendar app */
-        // TODO: open event instance
-        val eventUri = ContentUris.withAppendedId(CalendarContract.Instances.CONTENT_URI, item.id)
+        val eventUri = ContentUris.withAppendedId(CalendarContract.Events.CONTENT_URI, item.event.id)
         /* create fill-intent */
         val fillInIntent = Intent()
-        /* put eventUri as extra */
-        fillInIntent.putExtra(CalendarAppWidgetProvider.EVENT_URI_EXTRA, eventUri.toString())
+            /* put eventUri as extra */
+            .putExtra(CalendarAppWidgetProvider.EVENT_URI_EXTRA, eventUri.toString())
+            /* put begin and end extra to open specific instance */
+            .putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, item.begin)
+            .putExtra(CalendarContract.EXTRA_EVENT_END_TIME, item.end)
         /* set the fill-intent */
         remoteViews.setOnClickFillInIntent(R.id.event_card, fillInIntent)
 
