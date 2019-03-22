@@ -17,7 +17,7 @@ data class Calendar(
  * data class to hold selected columns from an event received by CalendarContract.Events:
  *      https://developer.android.com/guide/topics/providers/calendar-provider#events
  * */
-data class Event (
+data class Event(
     var id: Long = -1L,
     var title: String = "",
     var displayColor: Int = 0,
@@ -25,6 +25,18 @@ data class Event (
     var location: String = "",
     var calendarId: Long = -1L,
     var dtstart: Long = -1L,
-    var dtend: Long = -1L,
-    var allDay: Boolean = false
-)
+    var duration: String? = null,
+    var allDay: Boolean = false,
+    var instances: List<Event.Instance> = emptyList()
+) {
+    /**
+     * data class to hold selected columns from an event instance received by CalendarContract.Instances:
+     *      https://developer.android.com/reference/android/provider/CalendarContract.Instances.html
+     * */
+    data class Instance(
+        var id: Long = -1L,
+        var begin: Long = -1L,
+        var end: Long = -1L,
+        var event: Event = Event()
+    )
+}

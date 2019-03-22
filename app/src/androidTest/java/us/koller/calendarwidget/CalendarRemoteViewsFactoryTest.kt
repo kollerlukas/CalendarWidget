@@ -19,15 +19,9 @@ class CalendarRemoteViewsFactoryTest {
 
     companion object {
         /* mock input-data */
-        val mockEvents = listOf(
-            Event(
-                1L, "title1", 16777215 /* = #FFFFFF */, "description1",
-                "location1", 0L, 1L, 1000L, false
-            ),
-            Event(
-                2L, "title2", 16777215 /* = #FFFFFF */, "description2",
-                "location2", 0L, 1000L, 1000L, true
-            )
+        val mockInstances = listOf(
+            Event.Instance(2L, 1L, 1000L),
+            Event.Instance(3L, 1001L, 2000L)
         )
     }
 
@@ -47,10 +41,10 @@ class CalendarRemoteViewsFactoryTest {
         val context = ApplicationProvider.getApplicationContext<Context>()
 
         /* populate mocks */
-        Mockito.`when`(mockLoader.loadEvents(any(Int::class.java))).thenReturn(mockEvents)
+        Mockito.`when`(mockLoader.loadEventInstances(any(Int::class.java))).thenReturn(mockInstances)
 
         /* instantiate class under test */
-        factory = CalendarRemoteViewsFactory(context.packageName, mockLoader)
+        factory = CalendarRemoteViewsFactory(context.packageName, mockLoader, 7)
     }
 
     /**
@@ -86,8 +80,8 @@ class CalendarRemoteViewsFactoryTest {
         factory.onDataSetChanged()
 
         /* verify output */
-        if (factory.getItems() != mockEvents) {
-            Assert.fail("Wrong output:\n\texpected: $mockEvents\n\tactual:${factory.getItems()}")
+        if (factory.getItems() != mockInstances) {
+            Assert.fail("Wrong output:\n\texpected: $mockInstances\n\tactual:${factory.getItems()}")
         }
     }
 
@@ -105,7 +99,7 @@ class CalendarRemoteViewsFactoryTest {
     @Test
     fun testGetViewAt() {
         /* set data */
-        factory.setItems(mockEvents)
+        factory.setItems(mockInstances)
 
         /* call method to test */
         val remoteViews = factory.getViewAt(1)
@@ -121,13 +115,13 @@ class CalendarRemoteViewsFactoryTest {
     @Test
     fun testGetCount() {
         /* set data */
-        factory.setItems(mockEvents)
+        factory.setItems(mockInstances)
 
         /* call method to test */
         val count = factory.count
         /* verify output */
 
-        if (count != 2) {
+        if (count != mockInstances.size) {
             Assert.fail("Wrong output:\n\texpected: 2\n\tactual:$count")
         }
     }

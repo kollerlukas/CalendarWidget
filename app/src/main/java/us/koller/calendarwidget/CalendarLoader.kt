@@ -11,11 +11,11 @@ import android.provider.CalendarContract
  * */
 interface CalendarLoader {
 
-    /** load all events from all calendars that start within the a given amount of days (nextDays)
+    /** load all instances of events from all calendars that start within the a given amount of days (nextDays)
      * @param nextDays
      * @return a list of all events */
     @Suppress("RedundantVisibilityModifier")
-    public fun loadEvents(nextDays: Int): List<Event>
+    public fun loadEventInstances(nextDays: Int): List<Event.Instance>
 
     /** load all calendars
      * @return a list of all found calendars (events attribute is empty) */
@@ -26,9 +26,19 @@ interface CalendarLoader {
      * @param calendar
      * @param minDtEnd
      * @param maxDtStart
-     * @return modified calendar, containing all loaded events */
+     * @return list containing all loaded events (instances attribute is empty) */
     @Suppress("MemberVisibilityCanBePrivate", "RedundantVisibilityModifier")
-    public fun loadEventsForCalendar(calendar: Calendar, minDtEnd: Long, maxDtStart: Long): Calendar
+    public fun loadEventsForCalendar(calendar: Calendar, minDtEnd: Long, maxDtStart: Long): List<Event>
+
+    /**
+     * Function that load all instances of a given event.
+     * @param event for which the instances should be loaded
+     * @param begin of search range
+     * @param end of search range
+     * @return list of found instances
+     * */
+    @Suppress("RedundantVisibilityModifier")
+    public fun loadInstancesForEvent(event: Event, begin: Long, end: Long): List<Event.Instance>
 }
 
 /**
@@ -87,7 +97,7 @@ class CalendarLoaderImpl(private val contentResolver: ContentResolverWrapper) : 
             CalendarContract.Events.EVENT_LOCATION,
             CalendarContract.Events.CALENDAR_ID,
             CalendarContract.Events.DTSTART,
-            CalendarContract.Events.DTEND,
+            CalendarContract.Events.DURATION,
             CalendarContract.Events.ALL_DAY
         )
         /* event projection indices */
@@ -98,23 +108,33 @@ class CalendarLoaderImpl(private val contentResolver: ContentResolverWrapper) : 
         const val EVENT_PROJECTION_LOCATION_INDEX = 4
         const val EVENT_PROJECTION_CALENDAR_ID_INDEX = 5
         const val EVENT_PROJECTION_DTSTART_INDEX = 6
-        const val EVENT_PROJECTION_DTEND_INDEX = 7
+        const val EVENT_PROJECTION_DURATION_INDEX = 7
         const val EVENT_PROJECTION_ALL_DAY_INDEX = 8
+
+        /* instances projection array */
+        val INSTANCES_PROJECTION: Array<String> = arrayOf(
+            CalendarContract.Instances._ID,
+            CalendarContract.Instances.BEGIN,
+            CalendarContract.Instances.END
+        )
+        /* instances projection indices */
+        const val INSTANCES_PROJECTION_ID_INDEX = 0
+        const val INSTANCES_PROJECTION_BEGIN_INDEX = 1
+        const val INSTANCES_PROJECTION_END_INDEX = 2
     }
 
-    override fun loadEvents(nextDays: Int): List<Event> {
+    override fun loadEventInstances(nextDays: Int): List<Event.Instance> {
         val currTimeStamp = System.currentTimeMillis()
         val nextDaysMillis = nextDays * 24 * 60 * 60 * 1000
         return loadCalendars().asSequence()
             /* load all the events for each calendar */
             .map { loadEventsForCalendar(it, currTimeStamp, currTimeStamp + nextDaysMillis) }
-            /* map each calendar onto its events */
-            .map { it.events.filter { it.dtstart - currTimeStamp < nextDaysMillis } }
+            .flatten()
+            /* load all instances for each event */
+            .map { loadInstancesForEvent(it, currTimeStamp, currTimeStamp + nextDaysMillis) }
             .flatten()
             /* sort the events by starting time */
-            .sortedBy { it.dtstart }
-            /* remove duplicate events */
-            .distinctBy { it.id }
+            .sortedBy { it.begin }
             .toList()
     }
 
@@ -153,23 +173,30 @@ class CalendarLoaderImpl(private val contentResolver: ContentResolverWrapper) : 
         }
     }
 
-    override fun loadEventsForCalendar(calendar: Calendar, minDtEnd: Long, maxDtStart: Long): Calendar {
+    override fun loadEventsForCalendar(calendar: Calendar, minDtEnd: Long, maxDtStart: Long): List<Event> {
         /* read events for the calendar */
         /* build query */
         val uri: Uri = CalendarContract.Events.CONTENT_URI
         /* retrieve all events that start before maxDtStart */
-        val selection = "((${CalendarContract.Events.DTEND} > ?) AND (${CalendarContract.Events.DTSTART} < ?))"
-        val selectionArgs: Array<String> = arrayOf("$minDtEnd", "$maxDtStart")
-
+        val selection = "(" +
+                "(${CalendarContract.Events.CALENDAR_ID} = ?)" + /* all event from calendar */
+                " AND (" +
+                /* between minDtEnd and maxDtStart */
+                "((${CalendarContract.Events.DTEND} > ?) AND (${CalendarContract.Events.DTSTART} < ?)) OR " +
+                /* or is a recurring event */
+                "(${CalendarContract.Events.RRULE} != \"\" AND ${CalendarContract.Events.RRULE} IS NOT NULL)" + "))"
+        /* pass query parameters */
+        val selectionArgs: Array<String> = arrayOf("${calendar.id}", "$minDtEnd", "$maxDtStart")
+        /* sort by start time */
+        val sortOrder = "${CalendarContract.Events.DTSTART} ASC"
         var cursor: Cursor? = null
         try {
             /* run query */
-            cursor = contentResolver.query(uri, EVENTS_PROJECTION, selection, selectionArgs, null)
+            cursor = contentResolver.query(uri, EVENTS_PROJECTION, selection, selectionArgs, sortOrder)
             /* create new list to save found events */
             val events: MutableList<Event> = mutableListOf()
             /* iterate through the cursor */
             while (cursor.moveToNext()) {
-                /* instantiate new event */
                 Event(
                     cursor.getLong(EVENT_PROJECTION_ID_INDEX),
                     cursor.getString(EVENT_PROJECTION_TITLE_INDEX),
@@ -178,16 +205,55 @@ class CalendarLoaderImpl(private val contentResolver: ContentResolverWrapper) : 
                     cursor.getString(EVENT_PROJECTION_LOCATION_INDEX),
                     cursor.getLong(EVENT_PROJECTION_CALENDAR_ID_INDEX),
                     cursor.getLong(EVENT_PROJECTION_DTSTART_INDEX),
-                    cursor.getLong(EVENT_PROJECTION_DTEND_INDEX),
-                    cursor.getInt(EVENT_PROJECTION_ALL_DAY_INDEX) != 0
+                    cursor.getString(EVENT_PROJECTION_DURATION_INDEX),
+                    cursor.getInt(EVENT_PROJECTION_ALL_DAY_INDEX) == 1
                 ).let { events.add(it) }
             }
-            /* overwrite empty events list */
-            calendar.events = events
-            return calendar
+            /* return events */
+            return events
         } catch (e: SecurityException) {
             /* probably READ_CALENDAR permission not granted */
-            return calendar
+            return emptyList()
+        } finally {
+            /* finally close cursor */
+            cursor?.close()
+        }
+    }
+
+    override fun loadInstancesForEvent(event: Event, begin: Long, end: Long): List<Event.Instance> {
+        /* build query */
+        val uri: Uri = CalendarContract.Instances.CONTENT_URI
+            .buildUpon()
+            /* add range: begin > minEnd && end < maxBegin */
+            .appendPath("$begin")
+            .appendPath("$end")
+            .build()
+        /* retrieve all events instances the are in the search window between minEnd & maxStart */
+        val selection = "(Events.${CalendarContract.Events._ID} = ?)" /* all instances of an event */
+        /* pass query parameters */
+        val selectionArgs: Array<String> = arrayOf("${event.id}")
+        /* sort by begin time */
+        val sortOrder = "${CalendarContract.Instances.BEGIN} ASC"
+        var cursor: Cursor? = null
+        try {
+            /* run query */
+            cursor = contentResolver.query(uri, INSTANCES_PROJECTION, selection, selectionArgs, sortOrder)
+            /* create new list to save found events */
+            val instances: MutableList<Event.Instance> = mutableListOf()
+            /* iterate through the cursor */
+            while (cursor.moveToNext()) {
+                Event.Instance(
+                    cursor.getLong(INSTANCES_PROJECTION_ID_INDEX),
+                    cursor.getLong(INSTANCES_PROJECTION_BEGIN_INDEX),
+                    cursor.getLong(INSTANCES_PROJECTION_END_INDEX),
+                    event
+                ).let { instances.add(it) }
+            }
+            /* return instances */
+            return instances
+        } catch (e: SecurityException) {
+            /* probably READ_CALENDAR permission not granted */
+            return emptyList()
         } finally {
             /* finally close cursor */
             cursor?.close()
