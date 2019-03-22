@@ -133,12 +133,6 @@ class CalendarLoaderImplTest {
             mockContentResolver: CalendarLoaderImpl.ContentResolverWrapper,
             mockCursor: Cursor
         ) {
-            val uri: Uri = CalendarContract.Instances.CONTENT_URI
-                .buildUpon()
-                /* add range: begin > minEnd && end < maxBegin */
-                .appendPath("$beginQueryParam")
-                .appendPath("$endQueryParam")
-                .build()
             /* retrieve all events instances the are in the search window between minEnd & maxStart */
             Mockito.`when`(
                 mockContentResolver.query(

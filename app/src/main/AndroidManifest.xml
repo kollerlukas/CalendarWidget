@@ -14,7 +14,7 @@
             tools:ignore="AllowBackup,GoogleAppIndexingWarning">
 
         <!-- AppWidgetProvider -->
-        <receiver android:name=".CalendarAppWidgetProvider">
+        <receiver android:name=".widget.CalendarAppWidgetProvider">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
             </intent-filter>
@@ -24,7 +24,7 @@
         </receiver>
 
         <!-- AppWidgetConfigure -->
-        <activity android:name=".CalendarAppWidgetConfigure">
+        <activity android:name=".configure.CalendarAppWidgetConfigure">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE"/>
             </intent-filter>
@@ -32,7 +32,7 @@
 
         <!-- RemoteViewsService -->
         <service
-                android:name=".CalendarRemoteViewsService"
+                android:name=".widget.CalendarRemoteViewsService"
                 android:permission="android.permission.BIND_REMOTEVIEWS"
                 android:exported="false"/>
     </application>

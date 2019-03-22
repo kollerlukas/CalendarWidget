@@ -10,6 +10,7 @@ import org.mockito.ArgumentMatchers.any
 import org.mockito.Mock
 import org.mockito.Mockito
 import org.mockito.junit.MockitoJUnitRunner
+import us.koller.calendarwidget.widget.CalendarRemoteViewsFactory
 
 /**
  * test class for CalendarRemoteViewsFactory
@@ -19,9 +20,10 @@ class CalendarRemoteViewsFactoryTest {
 
     companion object {
         /* mock input-data */
+        private val mockEvent = Event(id = 2L, calendarId = 1L)
         val mockInstances = listOf(
-            Event.Instance(2L, 1L, 1000L),
-            Event.Instance(3L, 1001L, 2000L)
+            Event.Instance(3L, 1L, 1000L, mockEvent),
+            Event.Instance(4L, 1001L, 2000L, mockEvent)
         )
     }
 
@@ -44,7 +46,7 @@ class CalendarRemoteViewsFactoryTest {
         Mockito.`when`(mockLoader.loadEventInstances(any(Int::class.java))).thenReturn(mockInstances)
 
         /* instantiate class under test */
-        factory = CalendarRemoteViewsFactory(context.packageName, mockLoader, 7)
+        factory = CalendarRemoteViewsFactory(context.packageName, mockLoader, 7, listOf(1L))
     }
 
     /**

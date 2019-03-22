@@ -3,4 +3,10 @@
     <!-- today & tomorrow -->
     <string name="today">Today</string>
     <string name="tomorrow">tomorrow</string>
+    <!-- CalendarAppWidgetConfigure Menu -->
+    <string name="calendar_appwidget_configure_menu_done">Done</string>
+    <!-- Shared Preferences File Key -->
+    <string name="preference_file_key">us.koller.calendarwidget.PREFS_FILE_KEY</string>
+    <!-- Shared Preferences Keys -->
+    <string name="calendar_widget_prefs_key">us.koller.calendarwidget.CALENDAR_WIDGET_ID_%1$d_PREFS_KEY</string>
 </resources>

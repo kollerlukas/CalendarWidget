@@ -8,6 +8,6 @@
                     android:updatePeriodMillis="1800000"
                     android:initialLayout="@layout/calendar_appwidget_view"
                     android:previewImage="@drawable/preview_image"
-                    android:configure="us.koller.calendarwidget.CalendarAppWidgetConfigure"
+                    android:configure="us.koller.calendarwidget.configure.CalendarAppWidgetConfigure"
                     android:resizeMode="horizontal|vertical"
                     android:widgetCategory="home_screen"/>

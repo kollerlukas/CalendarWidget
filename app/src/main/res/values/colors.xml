@@ -7,6 +7,7 @@
     <!-- text colors -->
     <color name="textColorPrimary">#FFFFFF</color>
     <color name="textColorSecondary">#99FFFFFF</color>
+    <color name="textColorPrimaryDark">#de000000</color>
 
     <!-- bg color for event card -->
     <color name="event_card_bg_color">#33000000</color>

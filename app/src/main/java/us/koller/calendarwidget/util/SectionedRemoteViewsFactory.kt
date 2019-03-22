@@ -1,7 +1,8 @@
-package us.koller.calendarwidget
+package us.koller.calendarwidget.util
 
 import android.widget.RemoteViews
 import android.widget.RemoteViewsService
+import us.koller.calendarwidget.R
 import java.lang.IllegalStateException
 
 /**
