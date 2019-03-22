@@ -14,9 +14,6 @@ class Prefs(private val context: Context) {
     companion object {
         private var DAYS_SHOWN_IN_WIDGET: Int = 14
 
-        /**
-         * @return instance to SharedPreferences
-         * */
         private fun getSharedPrefs(context: Context): SharedPreferences {
             /* load preferences file key */
             val prefFileKey = context.getString(R.string.preference_file_key)

@@ -93,18 +93,17 @@ class CalendarAppWidgetConfigure : AppCompatActivity(), View.OnClickListener {
         when (view.id) {
             R.id.checkbox -> {
                 /* retrieve calendar id from view tag (was set in CalendarAdapter in CalendarHolder.bind() */
-                val calendarId = view.tag as Long
+                val calendarId = view.tag as? Long
                 /* find out whether checkbox is checked or not */
-                val checked = (view as CheckBox).isChecked
+                val checked = (view as? CheckBox)?.isChecked
                 /* modify calendar selection state */
-                calendarSelected.replace(calendarId, checked)
+                checked?.let { calendarId?.let { cId -> calendarSelected.replace(cId, it) } }
             }
             else -> {
                 return
             }
         }
     }
-
 
     /**
      * populate the RecyclerView with calendars
@@ -146,9 +145,6 @@ class CalendarAppWidgetConfigure : AppCompatActivity(), View.OnClickListener {
         setResultAndFinish(Activity.RESULT_CANCELED)
     }
 
-    /**
-     * helper method to set the result and finish the activity.
-     * */
     private fun setResultAndFinish(resultCode: Int, data: Intent? = null) {
         if (resultCode == Activity.RESULT_OK) {
             /* store widget preferences */
