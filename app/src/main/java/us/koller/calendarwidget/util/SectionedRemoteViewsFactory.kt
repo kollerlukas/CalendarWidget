@@ -52,7 +52,7 @@ abstract class SectionedRemoteViewsFactory<T>(var packageName: String) : RemoteV
         val section = Section(title)
         /* calculate the index in items */
         val sectionIndex = sections
-            .filter { it.first < index }
+            .filter { it.first <= index }
             .count() + index
         /* add section to items */
         items.add(sectionIndex, section)
