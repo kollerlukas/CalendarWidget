@@ -105,9 +105,6 @@ class CalendarAppWidgetConfigure : AppCompatActivity(), View.OnClickListener {
         }
     }
 
-    /**
-     * populate the RecyclerView with calendars
-     * */
     private fun loadCalendarsIntoRecyclerView() {
         /* load available calendars */
         val calendars = CalendarLoaderImpl.wrap(contentResolver).loadCalendars()
