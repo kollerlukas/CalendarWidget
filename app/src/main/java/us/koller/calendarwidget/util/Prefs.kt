@@ -12,7 +12,7 @@ import us.koller.calendarwidget.R
 class Prefs(private val context: Context) {
 
     companion object {
-        private var DAYS_SHOWN_IN_WIDGET: Int = 14
+        private var DAYS_SHOWN_IN_WIDGET: Int = 7
 
         private fun getSharedPrefs(context: Context): SharedPreferences {
             /* load preferences file key */

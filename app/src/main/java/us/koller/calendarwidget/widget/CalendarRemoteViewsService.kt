@@ -38,6 +38,7 @@ class CalendarRemoteViewsService : RemoteViewsService() {
         /* loading string resources here, because access to applicationContext */
         factory.todayString = applicationContext.getString(R.string.today)
         factory.tomorrowString = applicationContext.getString(R.string.tomorrow)
+        /* add section labels */
         /* return factory */
         return factory
     }
@@ -72,10 +73,16 @@ class CalendarRemoteViewsFactory(
     override fun onDataSetChanged() {
         /* date formatter */
         val formatter = SimpleDateFormat("EEE, dd MMMM")
+        /* get todays timestamp with 00:00:00:000 */
+        val todayCal = Calendar.getInstance()
+        todayCal.set(Calendar.HOUR_OF_DAY, 0)
+        todayCal.set(Calendar.MINUTE, 0)
+        todayCal.set(Calendar.SECOND, 0)
+        todayCal.set(Calendar.MILLISECOND, 0)
+        val todayTimestamp = todayCal.timeInMillis
         /* calculate today's and tomorrows date to replace by "Today" or "Tomorrow" string */
-        val currTimeStamp = System.currentTimeMillis()
-        val today = formatter.format(Date(currTimeStamp))
-        val tomorrow = formatter.format(Date(currTimeStamp + 24 * 60 * 60 * 1000))
+        val today = formatter.format(Date(todayTimestamp))
+        val tomorrow = formatter.format(Date(todayTimestamp + 24 * 60 * 60 * 1000))
         /* use loader to load events */
         val events = loader.loadEventInstances(daysShown)
             /* filter out event from un-selected calendars */
@@ -83,24 +90,31 @@ class CalendarRemoteViewsFactory(
         /* set items on SectionedRemoteViewsFactory */
         setItems(events)
         /* add sections */
-        events
-            /* map each event to its date */
-            .map {
-                val date = formatter.format(Date(it.begin))
-                when (date) {
-                    today -> todayString
-                    tomorrow -> tomorrowString
-                    else -> date
+        (0..daysShown)
+            /* map day to timestamp */
+            .map { todayTimestamp + it * 24 * 60 * 60 * 1000 }
+            /* find section index in list */
+            .map { t ->
+                val index = events.indexOfFirst { it.begin > t }
+                when (index) {
+                    /* no event on last day found */
+                    -1 -> Pair(events.size, t)
+                    else -> Pair(index, t)
                 }
             }
-            /* map to Pair of index and date */
-            .mapIndexed { i, d -> Pair<Int, String>(i, d) }
-            /* group by the date */
-            .groupBy { it.second }
-            /* find the lowest index with a certain date */
-            .map { Pair(it.value.minBy { it.first }?.first, it.key) }
+            /* map timestamp to string */
+            .map {
+                val date = formatter.format(Date(it.second))
+                Pair(
+                    it.first, when (date) {
+                        today -> todayString
+                        tomorrow -> tomorrowString
+                        else -> date
+                    }
+                )
+            }
             /* add the sections */
-            .forEach { it.first?.let { it1 -> addSection(it1, it.second) } }
+            .forEach { addSection(it.first, it.second) }
     }
 
     override fun getItemId(item: Event.Instance): Long {
