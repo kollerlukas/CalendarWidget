@@ -19,10 +19,10 @@ data class Calendar(
  * */
 data class Event(
     val id: Long = -1L,
-    val title: String = "",
+    val title: String? = "",
     val displayColor: Int = 0,
-    val description: String = "",
-    val location: String = "",
+    val description: String? = "",
+    val location: String? = "",
     val calendarId: Long = -1L,
     val dtstart: Long = -1L,
     val duration: String? = null,
