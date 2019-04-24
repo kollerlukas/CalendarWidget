@@ -3,8 +3,10 @@ package us.koller.calendarwidget.widget
 import android.appwidget.AppWidgetManager
 import android.content.ContentUris
 import android.content.Intent
+import android.icu.text.DateFormat
 import android.icu.text.SimpleDateFormat
 import android.provider.CalendarContract
+import android.util.Log
 import android.widget.RemoteViews
 import android.widget.RemoteViewsService
 import us.koller.calendarwidget.CalendarLoader
@@ -21,11 +23,9 @@ import java.util.*
 class CalendarRemoteViewsService : RemoteViewsService() {
 
     override fun onGetViewFactory(intent: Intent): RemoteViewsFactory {
-        /* retrieve widget id from */
-        val widgetId = intent.getIntExtra(
-            AppWidgetManager.EXTRA_APPWIDGET_ID,
-            AppWidgetManager.INVALID_APPWIDGET_ID
-        )
+        /* retrieve widget id from intent extras */
+        val widgetId =
+            intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID)
         /* new Preferences instance */
         val prefs = Prefs(applicationContext)
         /* create new factory */
@@ -33,12 +33,14 @@ class CalendarRemoteViewsService : RemoteViewsService() {
             applicationContext.packageName,
             CalendarLoaderImpl.wrap(applicationContext.contentResolver),
             prefs.getDaysShownInWidget(),
-            prefs.loadWidgetPrefs(widgetId).calendarIds
+            prefs.loadWidgetPrefs(widgetId).calendarIds,
+            todayString = applicationContext.getString(R.string.today),
+            tomorrowString = applicationContext.getString(R.string.tomorrow)
         )
-        /* loading string resources here, because access to applicationContext */
-        factory.todayString = applicationContext.getString(R.string.today)
-        factory.tomorrowString = applicationContext.getString(R.string.tomorrow)
-        /* add section labels */
+        /* set refresh fillInIntent */
+        val fillInIntent = Intent(CalendarAppWidgetProvider.UPDATE_WIDGET_ACTION)
+            .putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId)
+        factory.refreshFillInIntent = fillInIntent
         /* return factory */
         return factory
     }
@@ -51,11 +53,17 @@ class CalendarRemoteViewsFactory(
     packageName: String,
     private val loader: CalendarLoader,
     private val daysShown: Int,
-    private val selectedCalendars: List<Long>
+    private val selectedCalendars: List<Long>,
+    private val todayString: String?,
+    private val tomorrowString: String?,
+    private val timeFormatter: DateFormat = SimpleDateFormat("HH:mm"),
+    private val dateFormatter: DateFormat = SimpleDateFormat("EEE, dd MMMM")
 ) : SectionedRemoteViewsFactory<Event.Instance>(packageName) {
 
-    var todayString = ""
-    var tomorrowString = ""
+    /**
+     * fillInIntent for refresh onClick
+     * */
+    lateinit var refreshFillInIntent: Intent
 
     override fun onCreate() {
         /* nothing to create */
@@ -70,9 +78,17 @@ class CalendarRemoteViewsFactory(
         return null
     }
 
+    override fun getFooter(): RemoteViews {
+        /* set refresh button as footer */
+        val views = RemoteViews(packageName, R.layout.refesh_item_view)
+        /* add fillInIntent */
+        views.setOnClickFillInIntent(R.id.refresh_button, refreshFillInIntent)
+
+        return views
+    }
+
     override fun onDataSetChanged() {
-        /* date formatter */
-        val formatter = SimpleDateFormat("EEE, dd MMMM")
+        Log.d("CalendarRemoteViewsService", "onDataSetChanged called")
         /* get todays timestamp with 00:00:00:000 */
         val todayCal = Calendar.getInstance()
         todayCal.set(Calendar.HOUR_OF_DAY, 0)
@@ -81,8 +97,8 @@ class CalendarRemoteViewsFactory(
         todayCal.set(Calendar.MILLISECOND, 0)
         val todayTimestamp = todayCal.timeInMillis
         /* calculate today's and tomorrows date to replace by "Today" or "Tomorrow" string */
-        val today = formatter.format(Date(todayTimestamp))
-        val tomorrow = formatter.format(Date(todayTimestamp + 24 * 60 * 60 * 1000))
+        val today = dateFormatter.format(Date(todayTimestamp))
+        val tomorrow = dateFormatter.format(Date(todayTimestamp + 24 * 60 * 60 * 1000))
         /* use loader to load events */
         val events = loader.loadEventInstances(daysShown)
             /* filter out event from un-selected calendars */
@@ -90,13 +106,11 @@ class CalendarRemoteViewsFactory(
         /* set items on SectionedRemoteViewsFactory */
         setItems(events)
         /* add sections */
-        (0..daysShown)
-            /* map day to timestamp */
-            .map { todayTimestamp + it * 24 * 60 * 60 * 1000 }
+        /* map day to timestamp */
+        (0..daysShown).map { todayTimestamp + it * 24 * 60 * 60 * 1000 }
             /* find section index in list */
             .map { t ->
-                val index = events.indexOfFirst { it.begin > t }
-                when (index) {
+                when (val index = events.indexOfFirst { it.begin > t }) {
                     /* no event on last day found */
                     -1 -> Pair(events.size, t)
                     else -> Pair(index, t)
@@ -104,14 +118,20 @@ class CalendarRemoteViewsFactory(
             }
             /* map timestamp to string */
             .map {
-                val date = formatter.format(Date(it.second))
-                Pair(
-                    it.first, when (date) {
-                        today -> todayString
-                        tomorrow -> tomorrowString
-                        else -> date
-                    }
-                )
+                val date = dateFormatter.format(Date(it.second))
+                /* replace date by string if today and tomorrow string are available */
+                if (todayString != null && tomorrowString != null) {
+                    Pair(
+                        it.first, when (date) {
+                            today -> todayString
+                            tomorrow -> tomorrowString
+                            else -> date
+                        }
+                    )
+                } else {
+                    Pair(it.first, date)
+                }
+
             }
             /* add the sections */
             .forEach { addSection(it.first, it.second) }
@@ -132,7 +152,7 @@ class CalendarRemoteViewsFactory(
         views.setTextViewText(
             R.id.event_start_time,
             when (item.event.allDay) {
-                false -> SimpleDateFormat("HH:mm").format(Date(item.begin))
+                false -> timeFormatter.format(Date(item.begin))
                 else -> ""
             }
         )
@@ -143,7 +163,7 @@ class CalendarRemoteViewsFactory(
         /* construct eventUri to open event in calendar app */
         val eventUri = ContentUris.withAppendedId(CalendarContract.Events.CONTENT_URI, item.event.id)
         /* create fill-intent */
-        val fillInIntent = Intent()
+        val fillInIntent = Intent(CalendarAppWidgetProvider.EVENT_CLICKED_ACTION)
             /* put eventUri as extra */
             .putExtra(CalendarAppWidgetProvider.EVENT_URI_EXTRA, eventUri.toString())
             /* put begin and end extra to open specific instance */

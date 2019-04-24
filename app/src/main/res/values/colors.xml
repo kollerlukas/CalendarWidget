@@ -4,10 +4,13 @@
     <color name="colorPrimaryDark">#1565C0</color>
     <color name="colorAccent">#D81B60</color>
 
-    <!-- text colors -->
+    <!-- text colors (default: dark) -->
     <color name="textColorPrimary">#FFFFFF</color>
     <color name="textColorSecondary">#99FFFFFF</color>
-    <color name="textColorPrimaryDark">#de000000</color>
+
+    <!-- text colors (light) -->
+    <color name="textColorPrimaryLight">#de000000</color>
+    <color name="textColorSecondaryLight">#99000000</color>
 
     <!-- bg color for event card -->
     <color name="event_card_bg_color">#33000000</color>

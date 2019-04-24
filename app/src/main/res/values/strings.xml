@@ -16,4 +16,6 @@
     <string name="tomorrow">tomorrow</string>
     <!-- CalendarAppWidgetConfigure Menu -->
     <string name="calendar_appwidget_configure_menu_done">Done</string>
+    <!-- Widget refresh button label -->
+    <string name="refresh_button">Refresh</string>
 </resources>

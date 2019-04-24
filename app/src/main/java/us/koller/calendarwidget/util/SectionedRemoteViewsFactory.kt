@@ -1,14 +1,14 @@
 package us.koller.calendarwidget.util
 
+import android.content.Intent
 import android.widget.RemoteViews
-import android.widget.RemoteViewsService
 import us.koller.calendarwidget.R
-import java.lang.IllegalStateException
 
 /**
- * RemoteViewsFactory that adds the ability to add sections between items
+ * RemoteViewsFactory that adds the ability to add sections between items.
+ * Extends FooterRemoteViewsFactory to also have the ability to add a footer.
  * */
-abstract class SectionedRemoteViewsFactory<T>(var packageName: String) : RemoteViewsService.RemoteViewsFactory {
+abstract class SectionedRemoteViewsFactory<T>(var packageName: String) : FooterRemoteViewsFactory() {
 
     /**
      * abstract class to contain Items and Sections in the same list
@@ -29,8 +29,11 @@ abstract class SectionedRemoteViewsFactory<T>(var packageName: String) : RemoteV
     private var items: MutableList<ListItem> = mutableListOf()
     private var sections: MutableList<Pair<Int, Section>> = mutableListOf()
 
+    private var fillInIntent: Intent? = null
+
     /**
      * set the items that should be displayed in the ListView. Removes all previously set sections
+     * @param items
      * */
     fun setItems(items: List<T>) {
         this.items = items.map { Item(it) }.toMutableList()
@@ -38,7 +41,8 @@ abstract class SectionedRemoteViewsFactory<T>(var packageName: String) : RemoteV
     }
 
     /**
-     * return the items from the ListView, without sections
+     * return the items from the ListView, without sections.
+     * @return items
      * */
     fun getItems(): List<T> {
         @Suppress("UNCHECKED_CAST")
@@ -46,7 +50,17 @@ abstract class SectionedRemoteViewsFactory<T>(var packageName: String) : RemoteV
     }
 
     /**
+     * Set fillInIntent for OnClick on section headers.
+     * @param fillInIntent
+     * */
+    fun setSectionHeaderOnClickFillInIntent(fillInIntent: Intent) {
+        this.fillInIntent = fillInIntent
+    }
+
+    /**
      * add a section to the ListView
+     * @param index
+     * @param title
      * */
     fun addSection(index: Int, title: String) {
         val section = Section(title)
@@ -62,17 +76,19 @@ abstract class SectionedRemoteViewsFactory<T>(var packageName: String) : RemoteV
 
     /**
      * provide itemId for item
+     * @param item
      * */
     abstract fun getItemId(item: T): Long
 
     /**
      * provide RemoteView for Item
+     * @param item
      * */
     abstract fun getViewAt(item: T): RemoteViews
 
-    /* overridden methods from RemoteViewsService.RemoteViewsFactory */
+    /* overridden methods from FooterRemoteViewsFactory */
 
-    final override fun getItemId(index: Int): Long {
+    final override fun getItemViewId(index: Int): Long {
         return if (items[index] is Section) {
             index * 2L + 1L /* map to the uneven numbers */
         } else {
@@ -85,17 +101,19 @@ abstract class SectionedRemoteViewsFactory<T>(var packageName: String) : RemoteV
         return true
     }
 
-    final override fun getViewAt(index: Int): RemoteViews {
+    final override fun getItemViewAt(index: Int): RemoteViews {
         when {
             items[index] is Section -> {
                 val section: Section? = items[index] as? Section
                 /* create section remoteView */
-                val remoteViews = RemoteViews(packageName, R.layout.section_item_view)
+                val views = RemoteViews(packageName, R.layout.section_item_view)
                 /* bind Data */
                 /* set section title */
-                remoteViews.setTextViewText(R.id.section_title, section?.title)
+                views.setTextViewText(R.id.section_title, section?.title)
+                /* set the fill-intent */
+                views.setOnClickFillInIntent(R.id.section_item, fillInIntent)
                 /* return section remoteViews */
-                return remoteViews
+                return views
             }
             items[index] is Item<*> ->
                 @Suppress("UNCHECKED_CAST")
@@ -106,11 +124,11 @@ abstract class SectionedRemoteViewsFactory<T>(var packageName: String) : RemoteV
         }
     }
 
-    final override fun getCount(): Int {
+    final override fun getItemCount(): Int {
         return items.size
     }
 
-    final override fun getViewTypeCount(): Int {
+    final override fun getItemViewTypeCount(): Int {
         return 2 /* two viewTypes: regular item & section item */
     }
 }

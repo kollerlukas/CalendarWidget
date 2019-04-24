@@ -52,6 +52,11 @@ class CalendarLoaderImpl(private val contentResolver: ContentResolverWrapper) : 
     interface ContentResolverWrapper {
         /**
          * wrapper function for ContentResolver.query()
+         * @param uri
+         * @param projection
+         * @param selection
+         * @param selectionArgs
+         * @param sortOrder
          * */
         fun query(
             uri: Uri?, projection: Array<String>?, selection: String?, selectionArgs: Array<String>?, sortOrder: String?
@@ -61,6 +66,7 @@ class CalendarLoaderImpl(private val contentResolver: ContentResolverWrapper) : 
     companion object {
         /**
          * simple function to wrap contentResolver
+         * @param contentResolver
          * */
         fun wrap(contentResolver: ContentResolver): CalendarLoader {
             return CalendarLoaderImpl(object : ContentResolverWrapper {
