@@ -121,7 +121,7 @@ class CalendarRemoteViewsFactory(
                 }
                 /* create fillInIntent for section header onClick */
                 val fillInIntent = Intent(CalendarAppWidgetProvider.OPEN_DAY_ACTION)
-                    .putExtra(CalendarAppWidgetProvider.DAY_START_TIME_EXTRA, t)
+                    .putExtra(CalendarAppWidgetProvider.DATE_START_TIME_EXTRA, t)
                 /* add section header */
                 addSection(if (index == -1) events.size else index, date, fillInIntent)
             }

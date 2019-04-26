@@ -25,7 +25,8 @@ class CalendarAppWidgetProvider : AppWidgetProvider() {
             "us.koller.calendarwidget.widget.CalendarAppWidgetProvider.UPDATE_WIDGET_ACTION"
 
         const val EVENT_URI_EXTRA = "us.koller.calendarwidget.widget.CalendarAppWidgetProvider.EVENT_URI_EXTRA"
-        const val DAY_START_TIME_EXTRA = "us.koller.calendarwidget.widget.CalendarAppWidgetProvider.DAY_START_TIME_EXTRA"
+        const val DATE_START_TIME_EXTRA =
+            "us.koller.calendarwidget.widget.CalendarAppWidgetProvider.DATE_START_TIME_EXTRA"
     }
 
     private fun createRemoteViews(context: Context, widgetId: Int): RemoteViews {
@@ -72,6 +73,7 @@ class CalendarAppWidgetProvider : AppWidgetProvider() {
                 val eventEndTime = intent.getLongExtra(CalendarContract.EXTRA_EVENT_END_TIME, -1L)
                 /* launch calendar app and view given eventUri */
                 val eventIntent = Intent(Intent.ACTION_VIEW)
+                    /* FLAG_ACTIVITY_NEW_TASK: required, because outside of an activity */
                     .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                     .setData(eventUri)
                     .putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, eventBeginTime)
@@ -83,13 +85,17 @@ class CalendarAppWidgetProvider : AppWidgetProvider() {
             }
             /* e.g.: section header was clicked */
             OPEN_DAY_ACTION -> {
-                // TODO: open certain day in calendar
-                val dayStartTime = intent.getLongExtra(DAY_START_TIME_EXTRA, -1L)
-                /* launch calendar app and view given eventUri */
-                val calendarIntent = Intent(Intent.ACTION_MAIN)
-                    .addCategory(Intent.CATEGORY_APP_CALENDAR)
+                /* retrieve date start time from intent extra */
+                val dateStartTime = intent.getLongExtra(DATE_START_TIME_EXTRA, -1L)
+                /* build uri */
+                val builder = CalendarContract.CONTENT_URI.buildUpon()
+                    .appendPath("time")
+                    .appendPath("$dateStartTime")
+                /* create intent */
+                val calendarIntent = Intent(Intent.ACTION_VIEW, builder.build())
+                    /* FLAG_ACTIVITY_NEW_TASK: required, because outside of an activity */
                     .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                /* launch calendar with event */
+                /* launch calendar with specific date */
                 if (calendarIntent.resolveActivity(context.packageManager) != null) {
                     context.startActivity(calendarIntent)
                 }
@@ -98,10 +104,11 @@ class CalendarAppWidgetProvider : AppWidgetProvider() {
             UPDATE_WIDGET_ACTION -> {
                 Log.d("CalendarAppWidgetProvider", "UPDATE_WIDGET_ACTION")
                 /* retrieve widget id from intent extras */
-                val widgetId =
-                    intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID)
+                val widgetId = intent
+                    .getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID)
                 /* force reload of events list */
-                AppWidgetManager.getInstance(context).notifyAppWidgetViewDataChanged(widgetId, R.id.events_list)
+                AppWidgetManager.getInstance(context)
+                    .notifyAppWidgetViewDataChanged(widgetId, R.id.events_list)
             }
             else -> super.onReceive(context, intent)
         }
