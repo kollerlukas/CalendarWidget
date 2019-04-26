@@ -27,7 +27,7 @@ data class Event(
     val dtstart: Long = -1L,
     val duration: String? = null,
     val allDay: Boolean = false,
-    var instances: List<Event.Instance> = emptyList()
+    var instances: List<Instance> = emptyList()
 ) {
     /**
      * data class to hold selected columns from an event instance received by CalendarContract.Instances:
