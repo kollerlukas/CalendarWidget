@@ -23,13 +23,11 @@ abstract class SectionedRemoteViewsFactory<T>(var packageName: String) : FooterR
     /**
      * sections are listItems that are inserted into items
      * */
-    class Section(val title: String) : ListItem()
+    class Section(val title: String, val fillInIntent: Intent? = null) : ListItem()
 
     /* items that are displayed in the list view */
     private var items: MutableList<ListItem> = mutableListOf()
     private var sections: MutableList<Pair<Int, Section>> = mutableListOf()
-
-    private var fillInIntent: Intent? = null
 
     /**
      * set the items that should be displayed in the ListView. Removes all previously set sections
@@ -50,20 +48,12 @@ abstract class SectionedRemoteViewsFactory<T>(var packageName: String) : FooterR
     }
 
     /**
-     * Set fillInIntent for OnClick on section headers.
-     * @param fillInIntent
-     * */
-    fun setSectionHeaderOnClickFillInIntent(fillInIntent: Intent) {
-        this.fillInIntent = fillInIntent
-    }
-
-    /**
      * add a section to the ListView
      * @param index
      * @param title
      * */
-    fun addSection(index: Int, title: String) {
-        val section = Section(title)
+    fun addSection(index: Int, title: String, fillInIntent: Intent? = null) {
+        val section = Section(title, fillInIntent)
         /* calculate the index in items */
         val sectionIndex = sections
             .filter { it.first <= index }
@@ -111,7 +101,7 @@ abstract class SectionedRemoteViewsFactory<T>(var packageName: String) : FooterR
                 /* set section title */
                 views.setTextViewText(R.id.section_title, section?.title)
                 /* set the fill-intent */
-                views.setOnClickFillInIntent(R.id.section_item, fillInIntent)
+                views.setOnClickFillInIntent(R.id.section_item, section?.fillInIntent)
                 /* return section remoteViews */
                 return views
             }

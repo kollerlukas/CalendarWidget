@@ -83,22 +83,22 @@ class CalendarRemoteViewsFactory(
         val views = RemoteViews(packageName, R.layout.refesh_item_view)
         /* add fillInIntent */
         views.setOnClickFillInIntent(R.id.refresh_button, refreshFillInIntent)
-
         return views
     }
 
     override fun onDataSetChanged() {
         Log.d("CalendarRemoteViewsService", "onDataSetChanged called")
-        /* get todays timestamp with 00:00:00:000 */
+        /* get today timestamp with 00:00:00:000 */
         val todayCal = Calendar.getInstance()
         todayCal.set(Calendar.HOUR_OF_DAY, 0)
         todayCal.set(Calendar.MINUTE, 0)
         todayCal.set(Calendar.SECOND, 0)
         todayCal.set(Calendar.MILLISECOND, 0)
         val todayTimestamp = todayCal.timeInMillis
-        /* calculate today's and tomorrows date to replace by "Today" or "Tomorrow" string */
-        val today = dateFormatter.format(Date(todayTimestamp))
-        val tomorrow = dateFormatter.format(Date(todayTimestamp + 24 * 60 * 60 * 1000))
+        val tomorrowTimestamp = todayTimestamp + 24 * 60 * 60 * 1000
+        /* use "Today" or "Tomorrow" string or if null use today's and tomorrow's formatted date */
+        val today = todayString ?: dateFormatter.format(Date(todayTimestamp))
+        val tomorrow = tomorrowString ?: dateFormatter.format(Date(tomorrowTimestamp))
         /* use loader to load events */
         val events = loader.loadEventInstances(daysShown)
             /* filter out event from un-selected calendars */
@@ -106,35 +106,25 @@ class CalendarRemoteViewsFactory(
         /* set items on SectionedRemoteViewsFactory */
         setItems(events)
         /* add sections */
-        /* map day to timestamp */
+        /* map days to timestamp */
         (0..daysShown).map { todayTimestamp + it * 24 * 60 * 60 * 1000 }
-            /* find section index in list */
-            .map { t ->
-                when (val index = events.indexOfFirst { it.begin > t }) {
-                    /* no event on last day found */
-                    -1 -> Pair(events.size, t)
-                    else -> Pair(index, t)
+            .forEach { t ->
+                /* find section index in list */
+                val index = events.indexOfFirst { it.begin > t }
+                /* format date */
+                val date = when (t) {
+                    /* replace date by string if today and tomorrow string are available */
+                    todayTimestamp -> today
+                    tomorrowTimestamp -> tomorrow
+                    /* if not today or tomorrow just use formatted date */
+                    else -> dateFormatter.format(Date(t))
                 }
+                /* create fillInIntent for section header onClick */
+                val fillInIntent = Intent(CalendarAppWidgetProvider.OPEN_DAY_ACTION)
+                    .putExtra(CalendarAppWidgetProvider.DAY_START_TIME_EXTRA, t)
+                /* add section header */
+                addSection(if (index == -1) events.size else index, date, fillInIntent)
             }
-            /* map timestamp to string */
-            .map {
-                val date = dateFormatter.format(Date(it.second))
-                /* replace date by string if today and tomorrow string are available */
-                if (todayString != null && tomorrowString != null) {
-                    Pair(
-                        it.first, when (date) {
-                            today -> todayString
-                            tomorrow -> tomorrowString
-                            else -> date
-                        }
-                    )
-                } else {
-                    Pair(it.first, date)
-                }
-
-            }
-            /* add the sections */
-            .forEach { addSection(it.first, it.second) }
     }
 
     override fun getItemId(item: Event.Instance): Long {
@@ -163,7 +153,7 @@ class CalendarRemoteViewsFactory(
         /* construct eventUri to open event in calendar app */
         val eventUri = ContentUris.withAppendedId(CalendarContract.Events.CONTENT_URI, item.event.id)
         /* create fill-intent */
-        val fillInIntent = Intent(CalendarAppWidgetProvider.EVENT_CLICKED_ACTION)
+        val fillInIntent = Intent(CalendarAppWidgetProvider.OPEN_EVENT_ACTION)
             /* put eventUri as extra */
             .putExtra(CalendarAppWidgetProvider.EVENT_URI_EXTRA, eventUri.toString())
             /* put begin and end extra to open specific instance */
