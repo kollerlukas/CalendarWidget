@@ -9,10 +9,12 @@ import android.provider.CalendarContract
 import android.util.Log
 import android.widget.RemoteViews
 import android.widget.RemoteViewsService
+import androidx.appcompat.app.AppCompatDelegate
 import us.koller.calendarwidget.CalendarLoader
 import us.koller.calendarwidget.CalendarLoaderImpl
 import us.koller.calendarwidget.Event
 import us.koller.calendarwidget.R
+import us.koller.calendarwidget.util.CalendarWidgetPrefs
 import us.koller.calendarwidget.util.Prefs
 import us.koller.calendarwidget.util.SectionedRemoteViewsFactory
 import java.util.*
@@ -27,13 +29,12 @@ class CalendarRemoteViewsService : RemoteViewsService() {
         val widgetId =
             intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID)
         /* new Preferences instance */
-        val prefs = Prefs(applicationContext)
+        val prefs = Prefs(applicationContext).loadWidgetPrefs(widgetId)
         /* create new factory */
         val factory = CalendarRemoteViewsFactory(
             applicationContext.packageName,
             CalendarLoaderImpl.wrap(applicationContext.contentResolver),
-            prefs.getDaysShownInWidget(),
-            prefs.loadWidgetPrefs(widgetId).calendarIds,
+            prefs,
             todayString = applicationContext.getString(R.string.today),
             tomorrowString = applicationContext.getString(R.string.tomorrow)
         )
@@ -52,8 +53,7 @@ class CalendarRemoteViewsService : RemoteViewsService() {
 class CalendarRemoteViewsFactory(
     packageName: String,
     private val loader: CalendarLoader,
-    private val daysShown: Int,
-    private val selectedCalendars: List<Long>,
+    private val prefs: CalendarWidgetPrefs,
     private val todayString: String?,
     private val tomorrowString: String?,
     private val timeFormatter: DateFormat = SimpleDateFormat("HH:mm"),
@@ -86,6 +86,8 @@ class CalendarRemoteViewsFactory(
         return views
     }
 
+    override fun isThemeLight(): Boolean = prefs.isLightTheme()
+
     override fun onDataSetChanged() {
         Log.d("CalendarRemoteViewsService", "onDataSetChanged called")
         /* get today timestamp with 00:00:00:000 */
@@ -100,14 +102,14 @@ class CalendarRemoteViewsFactory(
         val today = todayString ?: dateFormatter.format(Date(todayTimestamp))
         val tomorrow = tomorrowString ?: dateFormatter.format(Date(tomorrowTimestamp))
         /* use loader to load events */
-        val events = loader.loadEventInstances(daysShown)
+        val events = loader.loadEventInstances(prefs.daysShown)
             /* filter out event from un-selected calendars */
-            .filter { selectedCalendars.contains(it.event.calendarId) }
+            .filter { prefs.calendarIds.contains(it.event.calendarId) }
         /* set items on SectionedRemoteViewsFactory */
         setItems(events)
         /* add sections */
         /* map days to timestamp */
-        (0..daysShown).map { todayTimestamp + it * 24 * 60 * 60 * 1000 }
+        (0..prefs.daysShown).map { todayTimestamp + it * 24 * 60 * 60 * 1000 }
             .forEach { t ->
                 /* find section index in list */
                 val index = events.indexOfFirst { it.begin > t }
@@ -134,18 +136,15 @@ class CalendarRemoteViewsFactory(
 
     override fun getViewAt(item: Event.Instance): RemoteViews {
         /* create new RemoteViews instance */
-        val views = RemoteViews(packageName, R.layout.event_item_view)
+        val layout = if (isThemeLight()) R.layout.event_item_view_light else R.layout.event_item_view
+        val views = RemoteViews(packageName, layout)
         /* bind Data */
         /* set colordot color */
         views.setInt(R.id.colordot, "setColorFilter", item.event.displayColor)
         /* set event start time */
-        views.setTextViewText(
-            R.id.event_start_time,
-            when (item.event.allDay) {
-                false -> timeFormatter.format(Date(item.begin))
-                else -> ""
-            }
-        )
+        if (!item.event.allDay) {
+            views.setTextViewText(R.id.event_start_time, timeFormatter.format(Date(item.begin)))
+        }
         /* set event title */
         views.setTextViewText(R.id.event_title, item.event.title)
 

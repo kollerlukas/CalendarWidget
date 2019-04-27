@@ -9,11 +9,12 @@
     <color name="textColorSecondary">#99FFFFFF</color>
 
     <!-- text colors (light) -->
-    <color name="textColorPrimaryLight">#de000000</color>
-    <color name="textColorSecondaryLight">#99000000</color>
+    <color name="textColorPrimaryLight">#99000000</color>
+    <color name="textColorSecondaryLight">#61000000</color>
 
     <!-- bg color for event card -->
     <color name="event_card_bg_color">#33000000</color>
+    <color name="event_card_bg_color_light">#19000000</color>
 
     <!-- shadow color for text -->
     <color name="text_shadow_color">#48000000</color>

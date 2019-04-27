@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- TODO: use when wallpaper is light -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:id="@+id/section_item"
               android:orientation="vertical"
@@ -10,11 +9,5 @@
             android:id="@+id/section_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:shadowColor="@color/text_shadow_color"
-            android:shadowDx=".0"
-            android:shadowDy="2.0"
-            android:shadowRadius="8.0"
-            android:letterSpacing=".1"
-            android:textAllCaps="true"
-            style="@style/SecondaryTextStyle.Light"/>
+            style="@style/SectionHeaderTextStyle.Light"/>
 </LinearLayout>

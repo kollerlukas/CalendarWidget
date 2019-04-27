@@ -1,7 +1,7 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+    <style name="AppTheme" parent="Theme.AppCompat.DayNight.DarkActionBar">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
@@ -25,12 +25,25 @@
         <item name="android:textStyle">normal</item>
     </style>
 
+    <style name="SectionHeaderTextStyle" parent="SecondaryTextStyle">
+        <item name="android:shadowColor">@color/text_shadow_color</item>
+        <item name="android:shadowDx">.0</item>
+        <item name="android:shadowDy">2.0</item>
+        <item name="android:shadowRadius">8.0</item>
+        <item name="android:letterSpacing">.1</item>
+        <item name="android:textAllCaps">true</item>
+    </style>
+
     <!-- styles for light backgrounds -->
     <style name="PrimaryTextStyle.Light" parent="PrimaryTextStyle">
         <item name="android:textColor">@color/textColorPrimaryLight</item>
     </style>
 
-    <style name="SecondaryTextStyle.Light" parent="PrimaryTextStyle.Light">
+    <style name="SecondaryTextStyle.Light" parent="SecondaryTextStyle">
+        <item name="android:textColor">@color/textColorSecondaryLight</item>
+    </style>
+
+    <style name="SectionHeaderTextStyle.Light" parent="SectionHeaderTextStyle">
         <item name="android:textColor">@color/textColorSecondaryLight</item>
     </style>
 </resources>

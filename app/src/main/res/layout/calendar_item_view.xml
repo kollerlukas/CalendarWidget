@@ -23,6 +23,5 @@
             android:layout_weight="1"
             android:layout_height="wrap_content"
             android:textSize="16sp"
-            android:textColor="@color/textColorPrimaryLight"
             android:layout_margin="16dp"/>
 </LinearLayout>

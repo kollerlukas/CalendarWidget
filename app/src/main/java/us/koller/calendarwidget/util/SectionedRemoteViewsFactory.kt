@@ -8,7 +8,8 @@ import us.koller.calendarwidget.R
  * RemoteViewsFactory that adds the ability to add sections between items.
  * Extends FooterRemoteViewsFactory to also have the ability to add a footer.
  * */
-abstract class SectionedRemoteViewsFactory<T>(var packageName: String) : FooterRemoteViewsFactory() {
+abstract class SectionedRemoteViewsFactory<T>(var packageName: String) :
+    FooterRemoteViewsFactory() {
 
     /**
      * abstract class to contain Items and Sections in the same list
@@ -91,12 +92,15 @@ abstract class SectionedRemoteViewsFactory<T>(var packageName: String) : FooterR
         return true
     }
 
+    abstract fun isThemeLight(): Boolean
+
     final override fun getItemViewAt(index: Int): RemoteViews {
         when {
             items[index] is Section -> {
                 val section: Section? = items[index] as? Section
                 /* create section remoteView */
-                val views = RemoteViews(packageName, R.layout.section_item_view)
+                val layout = if (isThemeLight()) R.layout.section_item_view_light else R.layout.section_item_view
+                val views = RemoteViews(packageName, layout)
                 /* bind Data */
                 /* set section title */
                 views.setTextViewText(R.id.section_title, section?.title)
@@ -119,6 +123,6 @@ abstract class SectionedRemoteViewsFactory<T>(var packageName: String) : FooterR
     }
 
     final override fun getItemViewTypeCount(): Int {
-        return 2 /* two viewTypes: regular item & section item */
+        return 2 * 2 /* two viewTypes: regular item & section item; times 2: for light & dark theme */
     }
 }
