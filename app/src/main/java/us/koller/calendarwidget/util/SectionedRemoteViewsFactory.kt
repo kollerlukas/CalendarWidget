@@ -92,6 +92,9 @@ abstract class SectionedRemoteViewsFactory<T>(var packageName: String) :
         return true
     }
 
+    /**
+     * @return true if widget is displayed in a light environment, false otherwise
+     * */
     abstract fun isThemeLight(): Boolean
 
     final override fun getItemViewAt(index: Int): RemoteViews {
