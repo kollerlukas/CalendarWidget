@@ -9,7 +9,6 @@ import android.provider.CalendarContract
 import android.util.Log
 import android.widget.RemoteViews
 import android.widget.RemoteViewsService
-import androidx.appcompat.app.AppCompatDelegate
 import us.koller.calendarwidget.CalendarLoader
 import us.koller.calendarwidget.CalendarLoaderImpl
 import us.koller.calendarwidget.Event
@@ -142,9 +141,10 @@ class CalendarRemoteViewsFactory(
         /* set colordot color */
         views.setInt(R.id.colordot, "setColorFilter", item.event.displayColor)
         /* set event start time */
-        if (!item.event.allDay) {
-            views.setTextViewText(R.id.event_start_time, timeFormatter.format(Date(item.begin)))
-        }
+        views.setTextViewText(
+            R.id.event_start_time,
+            if (item.event.allDay) "" else timeFormatter.format(Date(item.begin))
+        )
         /* set event title */
         views.setTextViewText(R.id.event_title, item.event.title)
 
