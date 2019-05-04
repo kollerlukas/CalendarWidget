@@ -33,6 +33,9 @@ class CalendarAppWidgetConfigure : AppCompatActivity(), View.OnClickListener {
 
     /* store id of associated widget  */
     private var widgetId: Int = AppWidgetManager.INVALID_APPWIDGET_ID
+
+    /* store widget preferences */
+    private lateinit var prefs: CalendarWidgetPrefs
     /* store which calendars are selected and which not: Map CalendarId to selected state */
     private lateinit var calendarSelected: MutableMap<Long, Boolean>
 
@@ -48,6 +51,8 @@ class CalendarAppWidgetConfigure : AppCompatActivity(), View.OnClickListener {
             AppWidgetManager.EXTRA_APPWIDGET_ID,
             AppWidgetManager.INVALID_APPWIDGET_ID
         )
+
+        prefs = CalendarWidgetPrefs(widgetId)
 
         /* permission needed to read the calendar */
         val perm: String = Manifest.permission.READ_CALENDAR
@@ -147,8 +152,10 @@ class CalendarAppWidgetConfigure : AppCompatActivity(), View.OnClickListener {
             /* store widget preferences */
             /* filter selected calendars */
             val selectedCalendars = calendarSelected.toList().filter { it.second }.map { it.first }
+            /* update preferences */
+            prefs.calendarIds = selectedCalendars
             /* store in Preferences */
-            Prefs(this).storeWidgetPrefs(CalendarWidgetPrefs(widgetId, selectedCalendars))
+            Prefs(this).storeWidgetPrefs(prefs)
         }
 
         if (data != null) {

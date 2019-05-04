@@ -2,6 +2,7 @@
 
     <!-- NON TRANSLATABLE STRINGS -->
 
+    <string name="app_name" translatable="false">Calendar Widget</string>
     <!-- Shared Preferences File Key -->
     <string name="preference_file_key" translatable="false">us.koller.calendarwidget.PREFS_FILE_KEY</string>
     <!-- Shared Preferences Keys -->
@@ -10,7 +11,6 @@
 
     <!-- TRANSLATABLE STRINGS -->
 
-    <string name="app_name">Calendar Widget</string>
     <!-- today & tomorrow -->
     <string name="today">Today</string>
     <string name="tomorrow">tomorrow</string>

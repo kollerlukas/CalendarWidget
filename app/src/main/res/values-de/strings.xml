@@ -1,0 +1,12 @@
+<resources>
+
+    <!-- TRANSLATABLE STRINGS -->
+
+    <!-- today & tomorrow -->
+    <string name="today">Heute</string>
+    <string name="tomorrow">Morgen</string>
+    <!-- CalendarAppWidgetConfigure Menu -->
+    <string name="calendar_appwidget_configure_menu_done">Fertig</string>
+    <!-- Widget refresh button label -->
+    <string name="refresh_button">Aktualisieren</string>
+</resources>
