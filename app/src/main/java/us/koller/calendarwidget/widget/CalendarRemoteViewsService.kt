@@ -30,12 +30,17 @@ class CalendarRemoteViewsService : RemoteViewsService() {
         /* new Preferences instance */
         val prefs = Prefs(applicationContext).loadWidgetPrefs(widgetId)
         /* create new factory */
+        val locale = resources.configuration.locales[0]
         val factory = CalendarRemoteViewsFactory(
             applicationContext.packageName,
             CalendarLoaderImpl.wrap(applicationContext.contentResolver),
             prefs,
             todayString = applicationContext.getString(R.string.today),
-            tomorrowString = applicationContext.getString(R.string.tomorrow)
+            tomorrowString = applicationContext.getString(R.string.tomorrow),
+            /* load default short dateFormat for formatting time (e.g.: automatically change from 12 to 24 h format) */
+            timeFormatter = DateFormat.getTimeInstance(DateFormat.SHORT, locale),
+            /* load dateFormatter for given skeleton: e.g.: german:'MO. 6. MAI', english-US:'MON, MAY 6' */
+            dateFormatter = DateFormat.getInstanceForSkeleton("eee, d MMMM", locale)
         )
         /* set refresh fillInIntent */
         val fillInIntent = Intent(CalendarAppWidgetProvider.UPDATE_WIDGET_ACTION)
