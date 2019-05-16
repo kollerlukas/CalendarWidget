@@ -1,32 +1,62 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.MaterialComponents.DayNight">
+    <style name="AppTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <!-- CalendarAppWidgetConfigure TextStyles -->
+
+    <style name="CalendarAppWidgetConfigure">
+
+    </style>
+
+    <style name="CalendarAppWidgetConfigure.TextStyle" parent="CalendarAppWidgetConfigure">
+
+    </style>
+
+    <style name="CalendarAppWidgetConfigure.TextStyle.SectionHeader" parent="CalendarAppWidgetConfigure.TextStyle">
+        <item name="android:paddingStart">16dp</item>
+        <item name="android:paddingEnd">16dp</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:textColor">?android:attr/colorPrimary</item>
+        <item name="android:letterSpacing">.1</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:layout_margin">4dp</item>
+    </style>
+
+    <!-- TextStyles for the widget -->
+
+    <style name="CalendarWidget">
+
+    </style>
+
     <!-- Light and Dark and not using values-night folder to independently change widget theme from system theme -->
 
     <!-- TextView styles -->
-    <style name="PrimaryTextStyle">
-        <item name="android:textSize">16sp</item>
-        <item name="android:textColor">@color/textColorPrimary</item>
-        <item name="android:textStyle">bold</item>
+    <style name="CalendarWidget.TextStyle">
         <item name="android:layout_margin">4dp</item>
         <item name="android:ellipsize">end</item>
         <item name="android:maxLines">1</item>
     </style>
 
-    <style name="SecondaryTextStyle" parent="PrimaryTextStyle">
+    <style name="CalendarWidget.TextStyle.Primary" parent="CalendarWidget.TextStyle">
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">@color/textColorPrimary</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="CalendarWidget.TextStyle.Secondary" parent="CalendarWidget.TextStyle.Primary">
         <item name="android:textSize">12sp</item>
         <item name="android:textColor">@color/textColorSecondary</item>
         <item name="android:textStyle">normal</item>
     </style>
 
-    <style name="SectionHeaderTextStyle" parent="SecondaryTextStyle">
+    <style name="CalendarWidget.TextStyle.SectionHeader" parent="CalendarWidget.TextStyle.Secondary">
         <item name="android:shadowColor">@color/text_shadow_color</item>
         <item name="android:shadowDx">.0</item>
         <item name="android:shadowDy">2.0</item>
@@ -36,15 +66,15 @@
     </style>
 
     <!-- styles for light backgrounds -->
-    <style name="PrimaryTextStyle.Light" parent="PrimaryTextStyle">
+    <style name="CalendarWidget.TextStyle.Primary.Light" parent="CalendarWidget.TextStyle.Primary">
         <item name="android:textColor">@color/textColorPrimaryLight</item>
     </style>
 
-    <style name="SecondaryTextStyle.Light" parent="SecondaryTextStyle">
+    <style name="CalendarWidget.TextStyle.Secondary.Light" parent="CalendarWidget.TextStyle.Secondary">
         <item name="android:textColor">@color/textColorSecondaryLight</item>
     </style>
 
-    <style name="SectionHeaderTextStyle.Light" parent="SectionHeaderTextStyle">
+    <style name="CalendarWidget.TextStyle.SectionHeader.Light" parent="CalendarWidget.TextStyle.SectionHeader">
         <item name="android:textColor">@color/textColorSecondaryLight</item>
     </style>
 </resources>

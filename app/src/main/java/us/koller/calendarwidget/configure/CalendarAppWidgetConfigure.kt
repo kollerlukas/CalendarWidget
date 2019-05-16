@@ -10,11 +10,13 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.widget.AdapterView
 import android.widget.CheckBox
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_widget_configure.*
 import us.koller.calendarwidget.CalendarLoaderImpl
 import us.koller.calendarwidget.R
@@ -24,7 +26,7 @@ import us.koller.calendarwidget.util.Prefs
 /**
  * WidgetConfigure Activity: User has the option to exclude calendars from showing up in the widget.
  * */
-class CalendarAppWidgetConfigure : AppCompatActivity(), View.OnClickListener {
+class CalendarAppWidgetConfigure : AppCompatActivity(), View.OnClickListener, AdapterView.OnItemSelectedListener {
 
     companion object {
         /* requestCode for the permission call */
@@ -43,8 +45,13 @@ class CalendarAppWidgetConfigure : AppCompatActivity(), View.OnClickListener {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_widget_configure)
 
+        setSupportActionBar(toolbar)
+
         /* set RecyclerView LayoutManager */
         recycler_view.layoutManager = LinearLayoutManager(this)
+
+        /* set itemSelectListener for theme spinner */
+        theme_spinner.onItemSelectedListener = this
 
         /* retrieve the widgetId from the intent */
         widgetId = intent.getIntExtra(
@@ -107,6 +114,19 @@ class CalendarAppWidgetConfigure : AppCompatActivity(), View.OnClickListener {
             else -> {
                 return
             }
+        }
+    }
+
+    override fun onNothingSelected(parent: AdapterView<*>?) {
+        // default theme: AUTO
+        prefs.theme = CalendarWidgetPrefs.THEME_AUTO
+    }
+
+    override fun onItemSelected(parent: AdapterView<*>, view: View, pos: Int, id: Long) {
+        prefs.theme = pos
+        // TODO
+        if (prefs.theme == CalendarWidgetPrefs.THEME_AUTO) {
+            Snackbar.make(root, "THEME_AUTO: Currently not yet implemented", Snackbar.LENGTH_SHORT).show()
         }
     }
 

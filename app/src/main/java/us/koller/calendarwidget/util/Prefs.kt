@@ -77,9 +77,9 @@ data class CalendarWidgetPrefs(
     lateinit var context: Context
 
     companion object {
-        private const val THEME_AUTO: Int = 0
-        private const val THEME_DARK: Int = 1
-        private const val THEME_LIGHT: Int = 2
+        const val THEME_AUTO: Int = 0
+        const val THEME_DARK: Int = 1
+        const val THEME_LIGHT: Int = 2
     }
 
     /**

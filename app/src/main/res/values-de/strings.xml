@@ -7,6 +7,11 @@
     <string name="tomorrow">Morgen</string>
     <!-- CalendarAppWidgetConfigure Menu -->
     <string name="calendar_appwidget_configure_menu_done">Fertig</string>
+    <!-- CalendarAppWidgetConfigure Section header -->
+    <string name="calendar_appwidget_configure_section_header_appearance">Erscheinung</string>
+    <string name="calendar_appwidget_configure_section_header_calendar">Kalendar</string>
+    <!-- CalendarAppWidgetConfigure Theme spinner Prompt + Entries -->
+    <string name="calendar_appwidget_configure_theme_spinner_prompt">Theme</string>
     <!-- Widget refresh button label -->
     <string name="refresh_button">Aktualisieren</string>
 </resources>

@@ -4,16 +4,63 @@
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               xmlns:tools="http://schemas.android.com/tools"
+              android:id="@+id/root"
               android:orientation="vertical"
               android:layout_width="match_parent"
               android:layout_height="match_parent"
               tools:context=".configure.CalendarAppWidgetConfigure">
 
+    <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?attr/colorPrimary"
+            android:layout_marginBottom="8dp"/>
+
+    <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/calendar_appwidget_configure_section_header_appearance"
+            style="?android:attr/listSeparatorTextViewStyle"/>
+    <!--style="@style/CalendarAppWidgetConfigure.TextStyle.SectionHeader"-->
+
+
+    <!-- TODO -->
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp"
+            android:paddingTop="16dp"
+            android:paddingBottom="16dp">
+
+        <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textSize="16sp"
+                android:textColor="?android:attr/textColorPrimary"
+                android:text="@string/calendar_appwidget_configure_theme_spinner_prompt"/>
+
+        <Spinner
+                android:id="@+id/theme_spinner"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:entries="@array/calendar_appwidget_configure_theme_spinner_entries"
+                android:prompt="@string/calendar_appwidget_configure_theme_spinner_prompt"/>
+    </LinearLayout>
+
+    <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/calendar_appwidget_configure_section_header_calendar"
+            style="?android:attr/listSeparatorTextViewStyle"/>
+    <!--style="@style/CalendarAppWidgetConfigure.TextStyle.SectionHeader"-->
+
     <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recycler_view"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:paddingTop="8dp"
-            android:paddingBottom="8dp"
+            android:layout_height="wrap_content"
             android:clipToPadding="false"/>
 </LinearLayout>

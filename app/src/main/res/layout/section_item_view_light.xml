@@ -9,5 +9,5 @@
             android:id="@+id/section_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            style="@style/SectionHeaderTextStyle.Light"/>
+            style="@style/CalendarWidget.TextStyle.SectionHeader.Light"/>
 </LinearLayout>
