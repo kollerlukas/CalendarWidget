@@ -59,7 +59,7 @@ class CalendarLoaderImpl(private val contentResolver: ContentResolverWrapper) : 
          * @param sortOrder
          * */
         fun query(
-            uri: Uri?, projection: Array<String>?, selection: String?, selectionArgs: Array<String>?, sortOrder: String?
+                uri: Uri?, projection: Array<String>?, selection: String?, selectionArgs: Array<String>?, sortOrder: String?
         ): Cursor
     }
 
@@ -71,8 +71,8 @@ class CalendarLoaderImpl(private val contentResolver: ContentResolverWrapper) : 
         fun wrap(contentResolver: ContentResolver): CalendarLoader {
             return CalendarLoaderImpl(object : ContentResolverWrapper {
                 override fun query(
-                    uri: Uri?, projection: Array<String>?, selection: String?, selectionArgs: Array<String>?,
-                    sortOrder: String?
+                        uri: Uri?, projection: Array<String>?, selection: String?, selectionArgs: Array<String>?,
+                        sortOrder: String?
                 ): Cursor {
                     return contentResolver.query(uri, projection, selection, selectionArgs, sortOrder)
                 }
@@ -81,12 +81,13 @@ class CalendarLoaderImpl(private val contentResolver: ContentResolverWrapper) : 
 
         /* calendar projection array */
         val CALENDAR_PROJECTION: Array<String> = arrayOf(
-            CalendarContract.Calendars._ID,
-            CalendarContract.Calendars.ACCOUNT_NAME,
-            CalendarContract.Calendars.CALENDAR_COLOR,
-            CalendarContract.Calendars.CALENDAR_DISPLAY_NAME,
-            CalendarContract.Calendars.OWNER_ACCOUNT
+                CalendarContract.Calendars._ID,
+                CalendarContract.Calendars.ACCOUNT_NAME,
+                CalendarContract.Calendars.CALENDAR_COLOR,
+                CalendarContract.Calendars.CALENDAR_DISPLAY_NAME,
+                CalendarContract.Calendars.OWNER_ACCOUNT
         )
+
         /* calendar projection indices */
         const val CALENDAR_PROJECTION_ID_INDEX = 0
         const val CALENDAR_PROJECTION_ACCOUNT_NAME_INDEX = 1
@@ -96,16 +97,18 @@ class CalendarLoaderImpl(private val contentResolver: ContentResolverWrapper) : 
 
         /* event projection array */
         val EVENTS_PROJECTION: Array<String> = arrayOf(
-            CalendarContract.Events._ID,
-            CalendarContract.Events.TITLE,
-            CalendarContract.Events.DISPLAY_COLOR,
-            CalendarContract.Events.DESCRIPTION,
-            CalendarContract.Events.EVENT_LOCATION,
-            CalendarContract.Events.CALENDAR_ID,
-            CalendarContract.Events.DTSTART,
-            CalendarContract.Events.DURATION,
-            CalendarContract.Events.ALL_DAY
+                CalendarContract.Events._ID,
+                CalendarContract.Events.TITLE,
+                CalendarContract.Events.DISPLAY_COLOR,
+                CalendarContract.Events.DESCRIPTION,
+                CalendarContract.Events.EVENT_LOCATION,
+                CalendarContract.Events.CALENDAR_ID,
+                CalendarContract.Events.DTSTART,
+                CalendarContract.Events.DTEND,
+                CalendarContract.Events.DURATION,
+                CalendarContract.Events.ALL_DAY
         )
+
         /* event projection indices */
         const val EVENT_PROJECTION_ID_INDEX = 0
         const val EVENT_PROJECTION_TITLE_INDEX = 1
@@ -114,15 +117,17 @@ class CalendarLoaderImpl(private val contentResolver: ContentResolverWrapper) : 
         const val EVENT_PROJECTION_LOCATION_INDEX = 4
         const val EVENT_PROJECTION_CALENDAR_ID_INDEX = 5
         const val EVENT_PROJECTION_DTSTART_INDEX = 6
-        const val EVENT_PROJECTION_DURATION_INDEX = 7
-        const val EVENT_PROJECTION_ALL_DAY_INDEX = 8
+        const val EVENT_PROJECTION_DTEND_INDEX = 7
+        const val EVENT_PROJECTION_DURATION_INDEX = 8
+        const val EVENT_PROJECTION_ALL_DAY_INDEX = 9
 
         /* instances projection array */
         val INSTANCES_PROJECTION: Array<String> = arrayOf(
-            CalendarContract.Instances._ID,
-            CalendarContract.Instances.BEGIN,
-            CalendarContract.Instances.END
+                CalendarContract.Instances._ID,
+                CalendarContract.Instances.BEGIN,
+                CalendarContract.Instances.END
         )
+
         /* instances projection indices */
         const val INSTANCES_PROJECTION_ID_INDEX = 0
         const val INSTANCES_PROJECTION_BEGIN_INDEX = 1
@@ -133,15 +138,15 @@ class CalendarLoaderImpl(private val contentResolver: ContentResolverWrapper) : 
         val currTimeStamp = System.currentTimeMillis()
         val nextDaysMillis = nextDays * 24 * 60 * 60 * 1000
         return loadCalendars().asSequence()
-            /* load all the events for each calendar */
-            .map { loadEventsForCalendar(it, currTimeStamp, currTimeStamp + nextDaysMillis) }
-            .flatten()
-            /* load all instances for each event */
-            .map { loadInstancesForEvent(it, currTimeStamp, currTimeStamp + nextDaysMillis) }
-            .flatten()
-            /* sort the events by starting time */
-            .sortedBy { it.begin }
-            .toList()
+                /* load all the events for each calendar */
+                .map { loadEventsForCalendar(it, currTimeStamp, currTimeStamp + nextDaysMillis) }
+                .flatten()
+                /* load all instances for each event */
+                .map { loadInstancesForEvent(it, currTimeStamp, currTimeStamp + nextDaysMillis) }
+                .flatten()
+                /* sort the events by starting time */
+                .sortedBy { it.begin }
+                .toList()
     }
 
     override fun loadCalendars(): List<Calendar> {
@@ -161,11 +166,11 @@ class CalendarLoaderImpl(private val contentResolver: ContentResolverWrapper) : 
             while (cursor.moveToNext()) {
                 /* instantiate calendar + add to the list */
                 Calendar(
-                    cursor.getLong(CALENDAR_PROJECTION_ID_INDEX),
-                    cursor.getString(CALENDAR_PROJECTION_DISPLAY_NAME_INDEX),
-                    cursor.getInt(CALENDAR_PROJECTION_CALENDAR_COLOR_INDEX),
-                    cursor.getString(CALENDAR_PROJECTION_ACCOUNT_NAME_INDEX),
-                    cursor.getString(CALENDAR_PROJECTION_OWNER_ACCOUNT_INDEX)
+                        cursor.getLong(CALENDAR_PROJECTION_ID_INDEX),
+                        cursor.getString(CALENDAR_PROJECTION_DISPLAY_NAME_INDEX),
+                        cursor.getInt(CALENDAR_PROJECTION_CALENDAR_COLOR_INDEX),
+                        cursor.getString(CALENDAR_PROJECTION_ACCOUNT_NAME_INDEX),
+                        cursor.getString(CALENDAR_PROJECTION_OWNER_ACCOUNT_INDEX)
                 ).let { calendars.add(it) }
             }
             /* return all found calendars */
@@ -204,15 +209,16 @@ class CalendarLoaderImpl(private val contentResolver: ContentResolverWrapper) : 
             /* iterate through the cursor */
             while (cursor.moveToNext()) {
                 Event(
-                    cursor.getLong(EVENT_PROJECTION_ID_INDEX),
-                    cursor.getString(EVENT_PROJECTION_TITLE_INDEX),
-                    cursor.getInt(EVENT_PROJECTION_COLOR_INDEX),
-                    cursor.getString(EVENT_PROJECTION_DESCRIPTION_INDEX),
-                    cursor.getString(EVENT_PROJECTION_LOCATION_INDEX),
-                    cursor.getLong(EVENT_PROJECTION_CALENDAR_ID_INDEX),
-                    cursor.getLong(EVENT_PROJECTION_DTSTART_INDEX),
-                    cursor.getString(EVENT_PROJECTION_DURATION_INDEX),
-                    cursor.getInt(EVENT_PROJECTION_ALL_DAY_INDEX) == 1
+                        cursor.getLong(EVENT_PROJECTION_ID_INDEX),
+                        cursor.getString(EVENT_PROJECTION_TITLE_INDEX),
+                        cursor.getInt(EVENT_PROJECTION_COLOR_INDEX),
+                        cursor.getString(EVENT_PROJECTION_DESCRIPTION_INDEX),
+                        cursor.getString(EVENT_PROJECTION_LOCATION_INDEX),
+                        cursor.getLong(EVENT_PROJECTION_CALENDAR_ID_INDEX),
+                        cursor.getLong(EVENT_PROJECTION_DTSTART_INDEX),
+                        cursor.getLong(EVENT_PROJECTION_DTEND_INDEX),
+                        cursor.getString(EVENT_PROJECTION_DURATION_INDEX),
+                        cursor.getInt(EVENT_PROJECTION_ALL_DAY_INDEX) == 1
                 ).let { events.add(it) }
             }
             /* return events */
@@ -229,11 +235,11 @@ class CalendarLoaderImpl(private val contentResolver: ContentResolverWrapper) : 
     override fun loadInstancesForEvent(event: Event, begin: Long, end: Long): List<Event.Instance> {
         /* build query */
         val uri: Uri = CalendarContract.Instances.CONTENT_URI
-            .buildUpon()
-            /* add range: begin > minEnd && end < maxBegin */
-            .appendPath("$begin")
-            .appendPath("$end")
-            .build()
+                .buildUpon()
+                /* add range: begin > minEnd && end < maxBegin */
+                .appendPath("$begin")
+                .appendPath("$end")
+                .build()
         /* retrieve all events instances the are in the search window between minEnd & maxStart */
         val selection = "(Events.${CalendarContract.Events._ID} = ?)" /* all instances of an event */
         /* pass query parameters */
@@ -249,10 +255,10 @@ class CalendarLoaderImpl(private val contentResolver: ContentResolverWrapper) : 
             /* iterate through the cursor */
             while (cursor.moveToNext()) {
                 Event.Instance(
-                    cursor.getLong(INSTANCES_PROJECTION_ID_INDEX),
-                    cursor.getLong(INSTANCES_PROJECTION_BEGIN_INDEX),
-                    cursor.getLong(INSTANCES_PROJECTION_END_INDEX),
-                    event
+                        cursor.getLong(INSTANCES_PROJECTION_ID_INDEX),
+                        cursor.getLong(INSTANCES_PROJECTION_BEGIN_INDEX),
+                        cursor.getLong(INSTANCES_PROJECTION_END_INDEX),
+                        event
                 ).let { instances.add(it) }
             }
             /* return instances */

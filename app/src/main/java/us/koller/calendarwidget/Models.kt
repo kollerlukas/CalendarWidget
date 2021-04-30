@@ -25,6 +25,7 @@ data class Event(
     val location: String? = "",
     val calendarId: Long = -1L,
     val dtstart: Long = -1L,
+    val dtend: Long = -1L,
     val duration: String? = null,
     val allDay: Boolean = false,
     var instances: List<Instance> = emptyList()

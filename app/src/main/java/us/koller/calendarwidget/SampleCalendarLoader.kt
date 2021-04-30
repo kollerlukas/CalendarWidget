@@ -13,12 +13,78 @@ class SampleCalendarLoaderMock : CalendarLoader {
             Calendar(
                 1, "", 0, "", "",
                 listOf(
-                    Event(2, "Linear algebra Lecture", Color.parseColor("#64B5F6"), "", "", 1, 1552288500000, null, false),
-                    Event(3, "Lunch", Color.parseColor("#F06292"), "", "", 1, 1552305600000, null, false),
-                    Event(4, "Afternoon Run", Color.parseColor("#9575CD"), "", "", 1, 1552318200000, null, false),
-                    Event(5, "Algorithm and Data Structures Lecture", Color.parseColor("#81C784"), "", "", 1, 1552381200000, null, false),
-                    Event(6, "Functional Programming Lecture", Color.parseColor("#DCE775"), "", "", 1, 1552395600000, null, false),
-                    Event(7, "Linear algebra Lecture", Color.parseColor("#64B5F6"), "", "", 1, 1552461300000, null, false)
+                    Event(
+                        2,
+                        "Linear algebra Lecture",
+                        Color.parseColor("#64B5F6"),
+                        "",
+                        "",
+                        1,
+                        1552288500000,
+                        1552293900000,
+                        null,
+                        false
+                    ),
+                    Event(
+                        3,
+                        "Lunch",
+                        Color.parseColor("#F06292"),
+                        "",
+                        "",
+                        1,
+                        1552305600000,
+                        1552311000000,
+                        null,
+                        false
+                    ),
+                    Event(
+                        4,
+                        "Afternoon Run",
+                        Color.parseColor("#9575CD"),
+                        "",
+                        "",
+                        1,
+                        1552318200000,
+                        1552323600000,
+                        null,
+                        false
+                    ),
+                    Event(
+                        5,
+                        "Algorithm and Data Structures Lecture",
+                        Color.parseColor("#81C784"),
+                        "",
+                        "",
+                        1,
+                        1552381200000,
+                        1552386600000,
+                        null,
+                        false
+                    ),
+                    Event(
+                        6,
+                        "Functional Programming Lecture",
+                        Color.parseColor("#DCE775"),
+                        "",
+                        "",
+                        1,
+                        1552395600000,
+                        1552401000000,
+                        null,
+                        false
+                    ),
+                    Event(
+                        7,
+                        "Linear algebra Lecture",
+                        Color.parseColor("#64B5F6"),
+                        "",
+                        "",
+                        1,
+                        1552461300000,
+                        1552466700000,
+                        null,
+                        false
+                    )
                 )
             )
         )
@@ -40,7 +106,11 @@ class SampleCalendarLoaderMock : CalendarLoader {
             .map { c -> Calendar(c.id, c.displayName, c.calendarColor, c.accountName, c.ownerName) }
     }
 
-    override fun loadEventsForCalendar(calendar: Calendar, minDtEnd: Long, maxDtStart: Long): List<Event> {
+    override fun loadEventsForCalendar(
+        calendar: Calendar,
+        minDtEnd: Long,
+        maxDtStart: Long
+    ): List<Event> {
         return calendars.find { it.id == calendar.id }?.events!!
     }
 

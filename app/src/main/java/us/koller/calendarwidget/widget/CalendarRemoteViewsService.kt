@@ -7,6 +7,7 @@ import android.icu.text.DateFormat
 import android.icu.text.SimpleDateFormat
 import android.provider.CalendarContract
 import android.util.Log
+import android.view.View
 import android.widget.RemoteViews
 import android.widget.RemoteViewsService
 import us.koller.calendarwidget.CalendarLoader
@@ -26,7 +27,10 @@ class CalendarRemoteViewsService : RemoteViewsService() {
     override fun onGetViewFactory(intent: Intent): RemoteViewsFactory {
         /* retrieve widget id from intent extras */
         val widgetId =
-            intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID)
+            intent.getIntExtra(
+                AppWidgetManager.EXTRA_APPWIDGET_ID,
+                AppWidgetManager.INVALID_APPWIDGET_ID
+            )
         /* new Preferences instance */
         val prefs = Prefs(applicationContext).loadWidgetPrefs(widgetId)
         /* create new factory */
@@ -140,22 +144,25 @@ class CalendarRemoteViewsFactory(
 
     override fun getViewAt(item: Event.Instance): RemoteViews {
         /* create new RemoteViews instance */
-        val layout = if (isThemeLight()) R.layout.event_item_view_light else R.layout.event_item_view
+        val layout =
+            if (isThemeLight()) R.layout.event_item_view_light else R.layout.event_item_view
         val views = RemoteViews(packageName, layout)
         /* bind Data */
         /* set colordot color */
         views.setInt(R.id.colordot, "setColorFilter", item.event.displayColor)
         /* set event start time */
+        views.setViewVisibility(R.id.event_time, if (item.event.allDay) View.GONE else View.VISIBLE)
         views.setTextViewText(
-            R.id.event_start_time,
-            if (item.event.allDay) "" else timeFormatter.format(Date(item.begin))
+            R.id.event_time,
+            "${timeFormatter.format(Date(item.begin))} - ${timeFormatter.format(Date(item.end))}"
         )
         /* set event title */
         views.setTextViewText(R.id.event_title, item.event.title)
 
         /* set the fill-intent to pass data back to CalendarAppwidgetProvider */
         /* construct eventUri to open event in calendar app */
-        val eventUri = ContentUris.withAppendedId(CalendarContract.Events.CONTENT_URI, item.event.id)
+        val eventUri =
+            ContentUris.withAppendedId(CalendarContract.Events.CONTENT_URI, item.event.id)
         /* create fill-intent */
         val fillInIntent = Intent(CalendarAppWidgetProvider.OPEN_EVENT_ACTION)
             /* put eventUri as extra */
