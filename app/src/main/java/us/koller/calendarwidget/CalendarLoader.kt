@@ -59,8 +59,8 @@ class CalendarLoaderImpl(private val contentResolver: ContentResolverWrapper) : 
          * @param sortOrder
          * */
         fun query(
-                uri: Uri?, projection: Array<String>?, selection: String?, selectionArgs: Array<String>?, sortOrder: String?
-        ): Cursor
+                uri: Uri, projection: Array<String>?, selection: String?, selectionArgs: Array<String>?, sortOrder: String?
+        ): Cursor?
     }
 
     companion object {
@@ -71,9 +71,9 @@ class CalendarLoaderImpl(private val contentResolver: ContentResolverWrapper) : 
         fun wrap(contentResolver: ContentResolver): CalendarLoader {
             return CalendarLoaderImpl(object : ContentResolverWrapper {
                 override fun query(
-                        uri: Uri?, projection: Array<String>?, selection: String?, selectionArgs: Array<String>?,
+                        uri: Uri, projection: Array<String>?, selection: String?, selectionArgs: Array<String>?,
                         sortOrder: String?
-                ): Cursor {
+                ): Cursor? {
                     return contentResolver.query(uri, projection, selection, selectionArgs, sortOrder)
                 }
             })
@@ -163,15 +163,17 @@ class CalendarLoaderImpl(private val contentResolver: ContentResolverWrapper) : 
             /* create new list to save found calendars */
             val calendars: MutableList<Calendar> = mutableListOf()
             /* iterate through the cursor */
-            while (cursor.moveToNext()) {
-                /* instantiate calendar + add to the list */
-                Calendar(
+            if (cursor != null) {
+                while (cursor.moveToNext()) {
+                    /* instantiate calendar + add to the list */
+                    Calendar(
                         cursor.getLong(CALENDAR_PROJECTION_ID_INDEX),
                         cursor.getString(CALENDAR_PROJECTION_DISPLAY_NAME_INDEX),
                         cursor.getInt(CALENDAR_PROJECTION_CALENDAR_COLOR_INDEX),
                         cursor.getString(CALENDAR_PROJECTION_ACCOUNT_NAME_INDEX),
                         cursor.getString(CALENDAR_PROJECTION_OWNER_ACCOUNT_INDEX)
-                ).let { calendars.add(it) }
+                    ).let { calendars.add(it) }
+                }
             }
             /* return all found calendars */
             return calendars
@@ -207,8 +209,9 @@ class CalendarLoaderImpl(private val contentResolver: ContentResolverWrapper) : 
             /* create new list to save found events */
             val events: MutableList<Event> = mutableListOf()
             /* iterate through the cursor */
-            while (cursor.moveToNext()) {
-                Event(
+            if (cursor != null) {
+                while (cursor.moveToNext()) {
+                    Event(
                         cursor.getLong(EVENT_PROJECTION_ID_INDEX),
                         cursor.getString(EVENT_PROJECTION_TITLE_INDEX),
                         cursor.getInt(EVENT_PROJECTION_COLOR_INDEX),
@@ -219,7 +222,8 @@ class CalendarLoaderImpl(private val contentResolver: ContentResolverWrapper) : 
                         cursor.getLong(EVENT_PROJECTION_DTEND_INDEX),
                         cursor.getString(EVENT_PROJECTION_DURATION_INDEX),
                         cursor.getInt(EVENT_PROJECTION_ALL_DAY_INDEX) == 1
-                ).let { events.add(it) }
+                    ).let { events.add(it) }
+                }
             }
             /* return events */
             return events
@@ -253,13 +257,15 @@ class CalendarLoaderImpl(private val contentResolver: ContentResolverWrapper) : 
             /* create new list to save found events */
             val instances: MutableList<Event.Instance> = mutableListOf()
             /* iterate through the cursor */
-            while (cursor.moveToNext()) {
-                Event.Instance(
+            if (cursor != null) {
+                while (cursor.moveToNext()) {
+                    Event.Instance(
                         cursor.getLong(INSTANCES_PROJECTION_ID_INDEX),
                         cursor.getLong(INSTANCES_PROJECTION_BEGIN_INDEX),
                         cursor.getLong(INSTANCES_PROJECTION_END_INDEX),
                         event
-                ).let { instances.add(it) }
+                    ).let { instances.add(it) }
+                }
             }
             /* return instances */
             return instances
