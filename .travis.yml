@@ -25,7 +25,7 @@ android:
 
 before_install:
   # Accept all sdk licenses
-  yes | sdkmanager "platforms;android-${ANDROID_API_LEVEL}" --licenses
+  yes | sdkmanager "platforms;android-${ANDROID_API_LEVEL};android-29"
 
 #
 # TODO: get emulator running on travis
