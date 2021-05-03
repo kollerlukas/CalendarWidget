@@ -69,7 +69,8 @@ class CalendarAppWidgetProvider : AppWidgetProvider() {
             OPEN_EVENT_ACTION -> {
                 /* get event data from intent extras */
                 val eventUri = Uri.parse(intent.getStringExtra(EVENT_URI_EXTRA))
-                val eventBeginTime = intent.getLongExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, -1L)
+                val eventBeginTime =
+                    intent.getLongExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, -1L)
                 val eventEndTime = intent.getLongExtra(CalendarContract.EXTRA_EVENT_END_TIME, -1L)
                 /* launch calendar app and view given eventUri */
                 val eventIntent = Intent(Intent.ACTION_VIEW)
